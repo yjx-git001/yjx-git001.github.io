@@ -1254,30 +1254,6 @@
             color: #718096;
         }
 
-        /* 自定义光标 */
-        .custom-cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #667eea;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.1s ease, width 0.2s, height 0.2s, border-color 0.2s;
-            transform: translate(-50%, -50%);
-        }
-
-        .custom-cursor.clicking {
-            transform: translate(-50%, -50%) scale(0.8);
-            background: rgba(102, 126, 234, 0.3);
-        }
-
-        .custom-cursor.hovering {
-            width: 40px;
-            height: 40px;
-            border-color: #f093fb;
-        }
-
         /* 彩带/纸屑效果 */
         .confetti {
             position: fixed;
@@ -1705,9 +1681,9 @@
             phone: '18325666364',
             email: '3307852286@qq.com',
             github: 'https://github.com/yjx-git001',
-            wechat: '微信号',
-            qq: 'QQ号',
-            bilibili: 'B站',
+            wechat: 'Y18325666364',
+            qq: '3307852286',
+            bilibili: 'https://www.bilibili.com/',
             skills: ['JavaScript', 'Python', 'HTML/CSS', 'React', 'Node.js', 'Git', 'Vue', 'TypeScript', 'Go', 'Gin'],
             birthday: '2002-06-13', // 生日
         };
@@ -2942,33 +2918,6 @@
         `;
         document.head.appendChild(shakeStyle);
 
-        // ========== 自定义光标 ==========
-        function initCustomCursor() {
-            const cursor = document.createElement('div');
-            cursor.className = 'custom-cursor';
-            document.body.appendChild(cursor);
-
-            document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
-            });
-
-            document.addEventListener('mousedown', () => {
-                cursor.classList.add('clicking');
-            });
-
-            document.addEventListener('mouseup', () => {
-                cursor.classList.remove('clicking');
-            });
-
-            // 悬浮在可点击元素上时变大
-            const clickables = document.querySelectorAll('a, button, .social-link, .contact-link, .skill-tag');
-            clickables.forEach(el => {
-                el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
-                el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
-            });
-        }
-
         // ========== 彩带/纸屑效果 ==========
         function createConfetti(count = 50) {
             const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3'];
@@ -3093,7 +3042,6 @@
             showPageTransition();
 
             setTimeout(() => {
-                initCustomCursor();
                 initKeyboardShortcuts();
                 initVisibilityChange();
                 setTimeout(showFloatingTip, 3000);
