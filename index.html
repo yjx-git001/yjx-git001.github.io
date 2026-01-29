@@ -727,19 +727,6 @@
             color: #e2e8f0;
         }
 
-        .weather-city-btn {
-            background: none;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-            opacity: 0.6;
-            padding: 2px;
-        }
-
-        .weather-city-btn:hover {
-            opacity: 1;
-        }
-
         .weather-temp {
             font-size: 36px;
             font-weight: 700;
@@ -2131,11 +2118,6 @@
             <label class="settings-label">生日</label>
             <input type="date" class="settings-input" id="setting-birthday" placeholder="2000-01-01">
 
-            <label class="settings-label">城市（天气）</label>
-            <div style="display: flex; gap: 8px;">
-                <input type="text" class="settings-input" id="setting-city" placeholder="留空自动获取位置" style="flex: 1; margin-bottom: 0;">
-                <button class="upload-btn" onclick="resetCityLocation()" title="重新获取位置">📍</button>
-            </div>
         </div>
 
         <!-- 联系方式设置 -->
@@ -2326,7 +2308,7 @@
                     </div>
                 </div>
                 <div class="weather-forecast" id="weather-forecast"></div>
-                <div class="weather-tip" id="weather-tip">💡 点击设置可修改城市</div>
+                <div class="weather-tip" id="weather-tip">💡 天气根据位置自动获取</div>
             </div>
 
             <!-- 倒计时卡片 -->
@@ -2564,9 +2546,6 @@
             // 设置生日
             document.getElementById('setting-birthday').value = currentConfig.birthday || '2000-01-01';
 
-            // 设置城市
-            document.getElementById('setting-city').value = currentConfig.city || '';
-
             // 更新头像预览
             updateAvatarPreview();
 
@@ -2574,14 +2553,6 @@
             renderSkillInputs();
         }
 
-        // 重置城市位置（重新获取地理位置）
-        function resetCityLocation() {
-            currentConfig.city = '';
-            currentConfig.latitude = null;
-            currentConfig.longitude = null;
-            document.getElementById('setting-city').value = '';
-            showNotification('📍 将重新获取位置');
-        }
 
         // 更新头像预览
         function updateAvatarPreview() {
@@ -2677,11 +2648,6 @@
             // 收集生日
             currentConfig.birthday = document.getElementById('setting-birthday').value || '2000-01-01';
 
-            // 收集城市设置
-            const newCity = document.getElementById('setting-city').value.trim();
-            const cityChanged = newCity !== currentConfig.city;
-            currentConfig.city = newCity;
-
             // 收集技能标签
             const skillInputs = document.querySelectorAll('[data-skill-index]');
             currentConfig.skills = Array.from(skillInputs).map(input => input.value).filter(v => v.trim());
@@ -2694,11 +2660,6 @@
 
             // 更新倒计时
             updateCountdowns();
-
-            // 如果城市改变了，刷新天气
-            if (cityChanged) {
-                refreshWeather();
-            }
 
             // 关闭面板
             toggleSettings();
@@ -2757,12 +2718,8 @@
                     },
                     (error) => {
                         console.log('获取位置失败:', error);
-                        // 如果有保存的城市则使用，否则使用IP定位
-                        if (currentConfig.city) {
-                            getWeatherByCity(currentConfig.city);
-                        } else {
-                            getWeatherByIP();
-                        }
+                        // 使用IP定位作为备用方案
+                        getWeatherByIP();
                     },
                     {
                         enableHighAccuracy: true,
@@ -2793,17 +2750,6 @@
                 const response = await fetch(`https://wttr.in/${lat},${lon}?format=j1&lang=zh`);
                 const data = await response.json();
                 processWeatherData(data);
-            } catch (error) {
-                console.error('获取天气失败:', error);
-                showWeatherError();
-            }
-        }
-
-        async function getWeatherByCity(city) {
-            try {
-                const response = await fetch(`https://wttr.in/${encodeURIComponent(city)}?format=j1&lang=zh`);
-                const data = await response.json();
-                processWeatherData(data, city);
             } catch (error) {
                 console.error('获取天气失败:', error);
                 showWeatherError();
@@ -2869,7 +2815,6 @@
                     <div class="weather-info">
                         <div class="weather-city">
                             📍 ${currentWeatherData.city}
-                            <button class="weather-city-btn" onclick="changeCity()" title="修改城市">✏️</button>
                         </div>
                         <div class="weather-temp">${currentWeatherData.temp}°C</div>
                         <div class="weather-desc">${currentWeatherData.desc}</div>
@@ -2906,7 +2851,7 @@
         }
 
         function generateWeatherTip() {
-            if (!currentWeatherData) return '💡 点击设置可修改城市';
+            if (!currentWeatherData) return '💡 天气根据位置自动获取';
 
             const temp = parseInt(currentWeatherData.temp);
             const code = parseInt(currentWeatherData.code);
@@ -3010,35 +2955,6 @@
 
             // 刷新时重新获取位置
             getLocation();
-        }
-
-        function changeCity() {
-            const newCity = prompt('请输入城市名称（留空则自动获取位置）：', currentConfig.city || '');
-            if (newCity !== null) {
-                if (newCity.trim() === '') {
-                    // 清空城市，重新获取位置
-                    currentConfig.city = '';
-                    currentConfig.latitude = null;
-                    currentConfig.longitude = null;
-                    saveConfig(currentConfig);
-                    showNotification('📍 将重新获取位置');
-                    refreshWeather();
-                } else {
-                    currentConfig.city = newCity.trim();
-                    saveConfig(currentConfig);
-
-                    const mainEl = document.getElementById('weather-main');
-                    mainEl.innerHTML = `
-                        <div class="weather-loading">
-                            <div class="loading-spinner"></div>
-                            <div>正在获取天气...</div>
-                        </div>
-                    `;
-
-                    getWeatherByCity(newCity.trim());
-                    showNotification('✅ 城市已更新');
-                }
-            }
         }
 
         // ========== 下班倒计时功能 ==========
