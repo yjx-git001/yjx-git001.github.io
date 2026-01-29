@@ -3,11 +3,3102 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>唤起特定引用</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg) scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 个人信息卡片 */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        body.dark-mode .profile-card,
+        body.dark-mode .card {
+            background: rgba(45, 55, 72, 0.95);
+            color: #e2e8f0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            animation: float 3s ease-in-out infinite;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-emoji {
+            font-size: 60px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        body.dark-mode h1 {
+            color: #e2e8f0;
+        }
+
+        .bio {
+            color: #718096;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        body.dark-mode .bio {
+            color: #a0aec0;
+        }
+
+        /* 状态标签 */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(72, 187, 120, 0.2);
+            color: #38a169;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #38a169;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 社交链接 */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .social-link:hover .social-icon {
+            transform: translateY(-4px);
+            background: rgba(102, 126, 234, 0.4);
+        }
+
+        .social-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .social-label {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        body.dark-mode .social-label {
+            color: #a5b4fc;
+        }
+
+        /* 功能卡片网格 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark-mode .card-title {
+            color: #e2e8f0;
+        }
+
+        .card-title::before {
+            font-size: 24px;
+        }
+
+        /* 联系方式 */
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .contact-link.revealed {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .contact-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .contact-link:hover::before {
+            left: 100%;
+        }
+
+        .contact-link:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+        }
+
+        .contact-link:active {
+            transform: translateY(-2px);
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-right: 12px;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .contact-label {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .contact-value {
+            font-size: 14px;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .contact-value.hidden {
+            user-select: none;
+        }
+
+        .contact-link.revealed .contact-value {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .contact-tip {
+            text-align: center;
+            font-size: 12px;
+            color: #718096;
+            margin-top: 12px;
+            padding: 8px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+        }
+
+        body.dark-mode .contact-tip {
+            color: #a0aec0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+        }
+
+        /* 技能标签 */
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            padding: 6px 12px;
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .skill-tag {
+            background: rgba(102, 126, 234, 0.3);
+            color: #a5b4fc;
+        }
+
+        .skill-tag:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 访客计数器 */
+        .visitor-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(102, 126, 234, 0.15);
+            border-radius: 12px;
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        body.dark-mode .visitor-counter {
+            background: rgba(102, 126, 234, 0.3);
+            color: #a5b4fc;
+        }
+
+        .visitor-counter .count {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* 每日一言 */
+        .quote-container {
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quote-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        body.dark-mode .quote-text {
+            color: #e2e8f0;
+        }
+
+        .quote-author {
+            font-size: 14px;
+            color: #718096;
+            text-align: right;
+        }
+
+        body.dark-mode .quote-author {
+            color: #a0aec0;
+        }
+
+        .refresh-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.2);
+            border: none;
+            border-radius: 8px;
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        body.dark-mode .refresh-btn {
+            color: #a5b4fc;
+        }
+
+        /* 倒计时 */
+        .countdown-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .countdown-item {
+            padding: 16px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .countdown-label {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        body.dark-mode .countdown-label {
+            color: #a0aec0;
+        }
+
+        .countdown-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        body.dark-mode .countdown-value {
+            color: #a5b4fc;
+        }
+
+        /* 时间显示 */
+        .time-display {
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        body.dark-mode .time-display {
+            color: #a0aec0;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        /* 设置按钮 */
+        .settings-btn {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .settings-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 设置面板 */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        body.dark-mode .settings-panel {
+            background: rgba(45, 55, 72, 0.98);
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .settings-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        body.dark-mode .settings-title {
+            color: #e2e8f0;
+        }
+
+        .close-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(102, 126, 234, 0.2);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+            transform: rotate(90deg);
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-input,
+        .settings-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.5);
+            color: #2d3748;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        body.dark-mode .settings-input,
+        body.dark-mode .settings-textarea {
+            background: rgba(45, 55, 72, 0.5);
+            color: #e2e8f0;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .settings-input:focus,
+        .settings-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        body.dark-mode .settings-input:focus,
+        body.dark-mode .settings-textarea:focus {
+            background: rgba(45, 55, 72, 0.8);
+        }
+
+        .settings-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .settings-label {
+            display: block;
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        body.dark-mode .settings-label {
+            color: #a0aec0;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #dc2626;
+            border: 2px solid #dc2626;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .reset-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .skill-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .skill-input-group input {
+            flex: 1;
+        }
+
+        .add-skill-btn,
+        .remove-skill-btn {
+            padding: 12px 16px;
+            background: rgba(102, 126, 234, 0.2);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .add-skill-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+        }
+
+        .remove-skill-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #dc2626;
+        }
+
+        .remove-skill-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1999;
+        }
+
+        .settings-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 头像上传 */
+        .avatar-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-btn {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+        }
+
+        /* 鼠标跟随粒子 */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 9999;
+            animation: particleFade 1s ease-out forwards;
+        }
+
+        @keyframes particleFade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+        /* 3D卡片效果 */
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .card-3d:hover {
+            z-index: 10;
+        }
+
+        /* 打字机光标 */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background: #667eea;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+            vertical-align: text-bottom;
+        }
+
+        body.dark-mode .typing-cursor {
+            background: #a5b4fc;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* 彩蛋模式 - 彩虹背景 */
+        body.rainbow-mode {
+            animation: rainbowBg 5s linear infinite;
+        }
+
+        @keyframes rainbowBg {
+            0% { background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%); }
+            20% { background: linear-gradient(135deg, #feca57 0%, #48dbfb 100%); }
+            40% { background: linear-gradient(135deg, #48dbfb 0%, #ff9ff3 100%); }
+            60% { background: linear-gradient(135deg, #ff9ff3 0%, #54a0ff 100%); }
+            80% { background: linear-gradient(135deg, #54a0ff 0%, #5f27cd 100%); }
+            100% { background: linear-gradient(135deg, #5f27cd 0%, #ff6b6b 100%); }
+        }
+
+        /* 头像点击特效 */
+        .avatar.clicked {
+            animation: avatarBounce 0.6s ease;
+        }
+
+        @keyframes avatarBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-20px) scale(1.1); }
+            50% { transform: translateY(0) scale(0.95); }
+            75% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        /* 烟花效果容器 */
+        .firework {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        .firework-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: fireworkExplode 1s ease-out forwards;
+        }
+
+        @keyframes fireworkExplode {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        /* 技能标签悬浮动画 */
+        .skill-tag {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-tag::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .skill-tag:active::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        /* 音乐可视化效果 */
+        .music-visualizer {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 3px;
+            height: 30px;
+            margin-top: 12px;
+        }
+
+        .music-bar {
+            width: 4px;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 2px;
+            animation: musicBounce 0.5s ease-in-out infinite alternate;
+        }
+
+        .music-bar:nth-child(1) { animation-delay: 0s; height: 10px; }
+        .music-bar:nth-child(2) { animation-delay: 0.1s; height: 20px; }
+        .music-bar:nth-child(3) { animation-delay: 0.2s; height: 15px; }
+        .music-bar:nth-child(4) { animation-delay: 0.3s; height: 25px; }
+        .music-bar:nth-child(5) { animation-delay: 0.4s; height: 18px; }
+        .music-bar:nth-child(6) { animation-delay: 0.5s; height: 22px; }
+        .music-bar:nth-child(7) { animation-delay: 0.6s; height: 12px; }
+
+        @keyframes musicBounce {
+            0% { transform: scaleY(0.3); }
+            100% { transform: scaleY(1); }
+        }
+
+        /* 滚动进度条 */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        /* 返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        /* 天气小组件 */
+        .weather-widget {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+
+        .weather-icon {
+            font-size: 32px;
+            animation: weatherFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes weatherFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .weather-info {
+            text-align: left;
+        }
+
+        .weather-temp {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        body.dark-mode .weather-temp {
+            color: #a5b4fc;
+        }
+
+        .weather-desc {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        body.dark-mode .weather-desc {
+            color: #a0aec0;
+        }
+
+        /* 问候语 */
+        .greeting {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 8px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        body.dark-mode .greeting {
+            color: #a5b4fc;
+        }
+
+        /* 连续访问徽章 */
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            animation: pulse 2s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        .streak-badge:hover {
+            transform: scale(1.05);
+        }
+
+        /* 点击游戏 */
+        .click-game {
+            padding: 16px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .click-game-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            cursor: pointer;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .click-game-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .click-game-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .click-game-btn:active::after {
+            width: 100px;
+            height: 100px;
+        }
+
+        .click-score {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        body.dark-mode .click-score {
+            color: #a5b4fc;
+        }
+
+        .click-timer {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        body.dark-mode .click-timer {
+            color: #a0aec0;
+        }
+
+        /* Matrix代码雨 */
+        .matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9997;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .matrix-canvas.active {
+            opacity: 1;
+        }
+
+        /* 成就徽章 */
+        .achievement {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            animation: achievementPop 0.5s ease-out forwards;
+        }
+
+        @keyframes achievementPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .achievement-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .achievement-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .achievement-desc {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* 自定义光标 */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease, width 0.2s, height 0.2s, border-color 0.2s;
+            transform: translate(-50%, -50%);
+        }
+
+        .custom-cursor.clicking {
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        .custom-cursor.hovering {
+            width: 40px;
+            height: 40px;
+            border-color: #f093fb;
+        }
+
+        /* 彩带/纸屑效果 */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            animation: confettiFall 3s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        /* 浮动提示气泡 */
+        .floating-tip {
+            position: fixed;
+            bottom: 100px;
+            left: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            animation: floatTip 3s ease-in-out infinite;
+            cursor: pointer;
+            z-index: 1000;
+            max-width: 200px;
+        }
+
+        .floating-tip::after {
+            content: '×';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            background: #f5576c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        @keyframes floatTip {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 页面切换动画 */
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pageTransition 1s ease-out forwards;
+        }
+
+        @keyframes pageTransition {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            100% { opacity: 0; pointer-events: none; }
+        }
+
+        .page-transition .loader {
+            font-size: 48px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 技能标签进度条 */
+        .skill-tag {
+            position: relative;
+        }
+
+        .skill-tag::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 0;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 0 0 8px 8px;
+            transition: width 0.5s ease;
+        }
+
+        .skill-tag:hover::before {
+            width: 100%;
+        }
+
+        /* 社交图标悬浮效果增强 */
+        .social-icon {
+            position: relative;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+            z-index: -1;
+        }
+
+        .social-link:hover .social-icon::before {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* 卡片闪光效果 */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+            pointer-events: none;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        /* 打字机文字选中效果 */
+        ::selection {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        ::-moz-selection {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
 </head>
 <body>
-    <a href="tel:18325666364">电话联系</a>
-    <a href="mailto:3307852286@qq.com">邮件联系</a>
-    <a href="sms:18325666364">短信联系</a>
+    <!-- 滚动进度条 -->
+    <div class="scroll-progress" id="scroll-progress"></div>
+
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <!-- 主题切换按钮 -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
+        <span id="theme-icon">🌙</span>
+    </button>
+
+    <!-- 设置按钮 -->
+    <button class="settings-btn" onclick="toggleSettings()" title="设置">
+        <span>⚙️</span>
+    </button>
+
+    <!-- 设置面板遮罩 -->
+    <div class="settings-overlay" id="settings-overlay" onclick="toggleSettings()"></div>
+
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-header">
+            <h2 class="settings-title">⚙️ 个性化设置</h2>
+            <button class="close-btn" onclick="toggleSettings()">✕</button>
+        </div>
+
+        <!-- 个人信息设置 -->
+        <div class="settings-section">
+            <div class="settings-section-title">👤 个人信息</div>
+
+            <label class="settings-label">头像</label>
+            <div class="avatar-upload">
+                <div class="avatar-preview" id="avatar-preview">
+                    <span id="preview-emoji">👨‍💻</span>
+                    <img id="preview-image" style="display: none;">
+                </div>
+                <div id="image-input-container" style="display: flex; gap: 8px;">
+                    <input type="file" id="avatar-file-input" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                    <button class="upload-btn" onclick="document.getElementById('avatar-file-input').click()">📁 选择图片</button>
+                    <button class="upload-btn" onclick="removeAvatar()" style="background: rgba(239, 68, 68, 0.2); border-color: #dc2626; color: #dc2626;">🗑️ 移除图片</button>
+                </div>
+            </div>
+
+            <label class="settings-label">名字</label>
+            <input type="text" class="settings-input" id="setting-name" placeholder="输入你的名字">
+
+            <label class="settings-label">个人简介</label>
+            <textarea class="settings-textarea" id="setting-bio" placeholder="介绍一下你自己"></textarea>
+
+            <label class="settings-label">状态</label>
+            <input type="text" class="settings-input" id="setting-status" placeholder="可以联系">
+
+            <label class="settings-label">生日</label>
+            <input type="date" class="settings-input" id="setting-birthday" placeholder="2000-01-01">
+        </div>
+
+        <!-- 联系方式设置 -->
+        <div class="settings-section">
+            <div class="settings-section-title">📱 联系方式</div>
+
+            <label class="settings-label">电话号码</label>
+            <input type="text" class="settings-input" id="setting-phone" placeholder="18325666364">
+
+            <label class="settings-label">邮箱地址</label>
+            <input type="email" class="settings-input" id="setting-email" placeholder="example@qq.com">
+        </div>
+
+        <!-- 社交链接设置 -->
+        <div class="settings-section">
+            <div class="settings-section-title">🔗 社交链接</div>
+
+            <label class="settings-label">GitHub 链接</label>
+            <input type="url" class="settings-input" id="setting-github" placeholder="https://github.com/username">
+
+            <label class="settings-label">微信号</label>
+            <input type="text" class="settings-input" id="setting-wechat" placeholder="你的微信号">
+
+            <label class="settings-label">QQ号</label>
+            <input type="text" class="settings-input" id="setting-qq" placeholder="你的QQ号">
+
+            <label class="settings-label">B站主页</label>
+            <input type="url" class="settings-input" id="setting-bilibili" placeholder="https://space.bilibili.com/xxx">
+        </div>
+
+        <!-- 技能标签设置 -->
+        <div class="settings-section">
+            <div class="settings-section-title">🚀 技能标签</div>
+            <div id="skills-container"></div>
+            <button class="add-skill-btn" onclick="addSkillInput()">+ 添加技能</button>
+        </div>
+
+        <!-- 保存和重置按钮 -->
+        <button class="save-btn" onclick="saveSettings()">💾 保存设置</button>
+        <button class="reset-btn" onclick="resetSettings()">🔄 恢复默认</button>
+    </div>
+
+    <div class="container">
+        <!-- 个人信息卡片 -->
+        <div class="profile-card">
+            <div class="avatar">👨‍💻</div>
+            <div class="greeting" id="greeting">👋 你好</div>
+            <h1>Hi, 我是 YJX</h1>
+            <p class="bio">
+                一个热爱编程的开发者 | 喜欢探索新技术 | 永远保持好奇心
+            </p>
+            <div class="status">
+                <span>可以联系</span>
+            </div>
+            <!-- 连续访问天数 -->
+            <div class="streak-badge" id="streak-badge" title="连续访问天数">
+                🔥 <span id="streak-count">1</span> 天
+            </div>
+
+            <!-- 社交链接 -->
+            <div class="social-links">
+                <a class="social-link" href="https://github.com" target="_blank" title="GitHub">
+                    <div class="social-icon">🐙</div>
+                    <span class="social-label">GitHub</span>
+                </a>
+                <a class="social-link" href="#" onclick="copyToClipboard('微信号'); return false;" title="微信">
+                    <div class="social-icon">💬</div>
+                    <span class="social-label">微信</span>
+                </a>
+                <a class="social-link" href="#" onclick="copyToClipboard('QQ号'); return false;" title="QQ">
+                    <div class="social-icon">🐧</div>
+                    <span class="social-label">QQ</span>
+                </a>
+                <a class="social-link" href="#" onclick="copyToClipboard('B站'); return false;" title="B站">
+                    <div class="social-icon">📺</div>
+                    <span class="social-label">B站</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 功能卡片网格 -->
+        <div class="cards-grid">
+            <!-- 联系方式卡片 -->
+            <div class="card">
+                <div class="card-title">📱 联系方式</div>
+                <div class="contact-links">
+                    <div class="contact-link" onclick="revealContact(this, 'tel:18325666364', '183-2566-6364')">
+                        <div class="icon">📞</div>
+                        <div class="contact-info">
+                            <span class="contact-label">电话</span>
+                            <span class="contact-value hidden">点击查看号码</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-link" onclick="revealContact(this, 'mailto:3307852286@qq.com', '3307852286@qq.com')">
+                        <div class="icon">✉️</div>
+                        <div class="contact-info">
+                            <span class="contact-label">邮箱</span>
+                            <span class="contact-value hidden">点击查看邮箱</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-link" onclick="revealContact(this, 'sms:18325666364', '183-2566-6364')">
+                        <div class="icon">💬</div>
+                        <div class="contact-info">
+                            <span class="contact-label">短信</span>
+                            <span class="contact-value hidden">点击查看号码</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-tip">💡 点击两次可直接打开应用</div>
+            </div>
+
+            <!-- 技能标签卡片 -->
+            <div class="card card-3d">
+                <div class="card-title">🚀 技能标签</div>
+                <div class="skills">
+                    <span class="skill-tag">JavaScript</span>
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">HTML/CSS</span>
+                    <span class="skill-tag">React</span>
+                    <span class="skill-tag">Node.js</span>
+                    <span class="skill-tag">Git</span>
+                    <span class="skill-tag">Vue</span>
+                    <span class="skill-tag">TypeScript</span>
+                </div>
+                <div class="time-display" id="current-time"></div>
+                <div class="music-visualizer">
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                    <div class="music-bar"></div>
+                </div>
+            </div>
+
+            <!-- 每日一言卡片 -->
+            <div class="card">
+                <div class="card-title">💭 每日一言</div>
+                <div class="quote-container">
+                    <div class="quote-text" id="quote-text">加载中...</div>
+                    <div class="quote-author" id="quote-author">— 佚名</div>
+                </div>
+                <button class="refresh-btn" onclick="refreshQuote()">
+                    <span>🔄</span> 换一句
+                </button>
+                <div class="visitor-counter">
+                    <span>👀 今日访客:</span>
+                    <span class="count" id="visitor-count">0</span>
+                </div>
+            </div>
+
+            <!-- 倒计时卡片 -->
+            <div class="card card-3d">
+                <div class="card-title">⏰ 重要日期</div>
+                <div class="countdown-container">
+                    <div class="countdown-item">
+                        <div class="countdown-label">🎉 距离春节</div>
+                        <div class="countdown-value" id="countdown-spring">计算中...</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-label">🎂 距离生日</div>
+                        <div class="countdown-value" id="countdown-birthday">计算中...</div>
+                    </div>
+                </div>
+                <!-- 天气小组件 -->
+                <div class="weather-widget" id="weather-widget">
+                    <span class="weather-icon" id="weather-icon">🌤️</span>
+                    <div class="weather-info">
+                        <div class="weather-temp" id="weather-temp">--°C</div>
+                        <div class="weather-desc" id="weather-desc">获取中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 点击小游戏卡片 -->
+            <div class="card card-3d">
+                <div class="card-title">🎮 点击挑战</div>
+                <div class="click-game">
+                    <button class="click-game-btn" id="click-btn" onclick="handleGameClick()">👆</button>
+                    <div class="click-score">得分: <span id="click-score">0</span></div>
+                    <div class="click-timer" id="click-timer">点击开始 10 秒挑战！</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matrix代码雨画布 -->
+        <canvas class="matrix-canvas" id="matrix-canvas"></canvas>
+
+        <div class="footer">
+            Made with ❤️ by YJX | © 2026
+        </div>
+    </div>
+
+    <script>
+        // 默认配置
+        const defaultConfig = {
+            name: 'YJX',
+            avatarImage: null, // base64图片数据
+            bio: '一个热爱编程的开发者 | 喜欢探索新技术 | 永远保持好奇心',
+            status: '可以联系',
+            phone: '18325666364',
+            email: '3307852286@qq.com',
+            github: 'https://github.com',
+            wechat: '微信号',
+            qq: 'QQ号',
+            bilibili: 'B站',
+            skills: ['JavaScript', 'Python', 'HTML/CSS', 'React', 'Node.js', 'Git', 'Vue', 'TypeScript'],
+            birthday: '2000-01-01', // 生日
+        };
+
+        // 加载配置
+        function loadConfig() {
+            const saved = localStorage.getItem('pageConfig');
+            return saved ? JSON.parse(saved) : defaultConfig;
+        }
+
+        // 保存配置
+        function saveConfig(config) {
+            localStorage.setItem('pageConfig', JSON.stringify(config));
+        }
+
+        // 当前配置
+        let currentConfig = loadConfig();
+
+        // 应用配置到页面
+        function applyConfig() {
+            // 更新头像
+            const avatarElement = document.querySelector('.avatar');
+            if (currentConfig.avatarImage) {
+                avatarElement.innerHTML = `<img src="${currentConfig.avatarImage}" alt="头像">`;
+            } else {
+                avatarElement.innerHTML = `<span class="avatar-emoji">👨‍💻</span>`;
+            }
+
+            // 更新个人信息
+            document.querySelector('h1').textContent = `Hi, 我是 ${currentConfig.name}`;
+            document.querySelector('.bio').textContent = currentConfig.bio;
+            document.querySelector('.status span').textContent = currentConfig.status;
+
+            // 更新联系方式
+            const phoneLink = document.querySelector('[href^="tel:"]');
+            if (phoneLink) {
+                phoneLink.setAttribute('onclick', `revealContact(this, 'tel:${currentConfig.phone}', '${formatPhone(currentConfig.phone)}')`);
+            }
+
+            const emailLink = document.querySelector('[href^="mailto:"]');
+            if (emailLink) {
+                emailLink.setAttribute('onclick', `revealContact(this, 'mailto:${currentConfig.email}', '${currentConfig.email}')`);
+            }
+
+            const smsLink = document.querySelector('[href^="sms:"]');
+            if (smsLink) {
+                smsLink.setAttribute('onclick', `revealContact(this, 'sms:${currentConfig.phone}', '${formatPhone(currentConfig.phone)}')`);
+            }
+
+            // 更新社交链接
+            const socialLinks = document.querySelectorAll('.social-link');
+            if (socialLinks[0]) socialLinks[0].href = currentConfig.github;
+            if (socialLinks[1]) socialLinks[1].setAttribute('onclick', `copyToClipboard('${currentConfig.wechat}'); return false;`);
+            if (socialLinks[2]) socialLinks[2].setAttribute('onclick', `copyToClipboard('${currentConfig.qq}'); return false;`);
+            if (socialLinks[3]) socialLinks[3].setAttribute('onclick', `copyToClipboard('${currentConfig.bilibili}'); return false;`);
+
+            // 更新技能标签
+            const skillsContainer = document.querySelector('.skills');
+            skillsContainer.innerHTML = currentConfig.skills.map(skill =>
+                `<span class="skill-tag">${skill}</span>`
+            ).join('');
+        }
+
+        // 格式化电话号码
+        function formatPhone(phone) {
+            return phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+        }
+
+        // 打开/关闭设置面板
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            const overlay = document.getElementById('settings-overlay');
+
+            // 如果面板已经打开，直接关闭
+            if (panel.classList.contains('open')) {
+                panel.classList.remove('open');
+                overlay.classList.remove('open');
+                return;
+            }
+
+            // 如果面板未打开，需要验证密码
+            const password = prompt('请输入设置密码：');
+            if (password === '88888888') {
+                panel.classList.add('open');
+                overlay.classList.add('open');
+                loadSettingsToForm();
+            } else if (password !== null) {
+                // 用户输入了错误密码（不是点击取消）
+                showNotification('❌ 密码错误，无法进入设置');
+            }
+        }
+
+        // 加载设置到表单
+        function loadSettingsToForm() {
+            document.getElementById('setting-name').value = currentConfig.name;
+            document.getElementById('setting-bio').value = currentConfig.bio;
+            document.getElementById('setting-status').value = currentConfig.status;
+            document.getElementById('setting-phone').value = currentConfig.phone;
+            document.getElementById('setting-email').value = currentConfig.email;
+            document.getElementById('setting-github').value = currentConfig.github;
+            document.getElementById('setting-wechat').value = currentConfig.wechat;
+            document.getElementById('setting-qq').value = currentConfig.qq;
+            document.getElementById('setting-bilibili').value = currentConfig.bilibili;
+
+            // 设置生日
+            document.getElementById('setting-birthday').value = currentConfig.birthday || '2000-01-01';
+
+            // 更新头像预览
+            updateAvatarPreview();
+
+            // 加载技能标签
+            renderSkillInputs();
+        }
+
+        // 更新头像预览
+        function updateAvatarPreview() {
+            const previewEmoji = document.getElementById('preview-emoji');
+            const previewImage = document.getElementById('preview-image');
+
+            if (currentConfig.avatarImage) {
+                previewEmoji.style.display = 'none';
+                previewImage.style.display = 'block';
+                previewImage.src = currentConfig.avatarImage;
+            } else {
+                previewEmoji.style.display = 'block';
+                previewImage.style.display = 'none';
+            }
+        }
+
+        // 处理头像上传
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 检查文件类型
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件！');
+                return;
+            }
+
+            // 检查文件大小（限制为2MB）
+            if (file.size > 2 * 1024 * 1024) {
+                alert('图片大小不能超过2MB！');
+                return;
+            }
+
+            // 读取文件并转换为base64
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentConfig.avatarImage = e.target.result;
+                updateAvatarPreview();
+                showNotification('✅ 图片已上传，记得保存设置！');
+            };
+            reader.onerror = function() {
+                alert('图片读取失败，请重试！');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 移除头像图片
+        function removeAvatar() {
+            if (confirm('确定要移除头像图片吗？')) {
+                currentConfig.avatarImage = null;
+                document.getElementById('avatar-file-input').value = '';
+                updateAvatarPreview();
+                showNotification('✅ 头像图片已移除');
+            }
+        }
+
+        // 渲染技能输入框
+        function renderSkillInputs() {
+            const container = document.getElementById('skills-container');
+            container.innerHTML = currentConfig.skills.map((skill, index) => `
+                <div class="skill-input-group">
+                    <input type="text" class="settings-input" value="${skill}" data-skill-index="${index}">
+                    <button class="remove-skill-btn" onclick="removeSkill(${index})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        // 添加技能输入框
+        function addSkillInput() {
+            currentConfig.skills.push('');
+            renderSkillInputs();
+        }
+
+        // 删除技能
+        function removeSkill(index) {
+            currentConfig.skills.splice(index, 1);
+            renderSkillInputs();
+        }
+
+        // 保存设置
+        function saveSettings() {
+            // 收集表单数据
+            currentConfig.name = document.getElementById('setting-name').value || 'YJX';
+            currentConfig.bio = document.getElementById('setting-bio').value || '一个热爱编程的开发者';
+            currentConfig.status = document.getElementById('setting-status').value || '可以联系';
+            currentConfig.phone = document.getElementById('setting-phone').value || '18325666364';
+            currentConfig.email = document.getElementById('setting-email').value || 'example@qq.com';
+            currentConfig.github = document.getElementById('setting-github').value || 'https://github.com';
+            currentConfig.wechat = document.getElementById('setting-wechat').value || '微信号';
+            currentConfig.qq = document.getElementById('setting-qq').value || 'QQ号';
+            currentConfig.bilibili = document.getElementById('setting-bilibili').value || 'B站';
+
+            // 收集生日
+            currentConfig.birthday = document.getElementById('setting-birthday').value || '2000-01-01';
+
+            // 收集技能标签
+            const skillInputs = document.querySelectorAll('[data-skill-index]');
+            currentConfig.skills = Array.from(skillInputs).map(input => input.value).filter(v => v.trim());
+
+            // 保存到localStorage
+            saveConfig(currentConfig);
+
+            // 应用到页面
+            applyConfig();
+
+            // 更新倒计时
+            updateCountdowns();
+
+            // 关闭面板
+            toggleSettings();
+
+            // 显示提示
+            showNotification('✅ 设置已保存！');
+        }
+
+        // 重置设置
+        function resetSettings() {
+            if (confirm('确定要恢复默认设置吗？这将清除所有自定义内容。')) {
+                currentConfig = { ...defaultConfig };
+                currentConfig.avatarImage = null;
+                saveConfig(currentConfig);
+                applyConfig();
+                loadSettingsToForm();
+                showNotification('✅ 已恢复默认设置！');
+            }
+        }
+
+        // 页面加载时应用配置
+        window.addEventListener('DOMContentLoaded', () => {
+            applyConfig();
+        });
+
+        // 联系方式显示功能
+        function revealContact(element, href, contactValue) {
+            if (element.classList.contains('revealed')) {
+                // 第二次点击，直接跳转
+                window.location.href = href;
+                return;
+            }
+
+            // 第一次点击，显示联系方式
+            const valueElement = element.querySelector('.contact-value');
+            valueElement.textContent = contactValue;
+            valueElement.classList.remove('hidden');
+            element.classList.add('revealed');
+
+            // 更新提示文本
+            if (href.startsWith('tel:')) {
+                valueElement.textContent = contactValue + ' (再次点击拨打)';
+            } else if (href.startsWith('mailto:')) {
+                valueElement.textContent = contactValue + ' (再次点击发邮件)';
+            } else if (href.startsWith('sms:')) {
+                valueElement.textContent = contactValue + ' (再次点击发短信)';
+            }
+
+            // 保存已显示状态
+            const contactType = href.split(':')[0];
+            localStorage.setItem(`contact-revealed-${contactType}`, 'true');
+
+            element.onclick = null;
+            const link = document.createElement('a');
+            link.href = href;
+            link.className = element.className;
+            link.innerHTML = element.innerHTML;
+            element.parentNode.replaceChild(link, element);
+        }
+
+        // 恢复联系方式显示状态
+        function restoreContactStates() {
+            const contacts = [
+                { type: 'tel', selector: '[href^="tel:"]' },
+                { type: 'mailto', selector: '[href^="mailto:"]' },
+                { type: 'sms', selector: '[href^="sms:"]' }
+            ];
+
+            contacts.forEach(contact => {
+                if (localStorage.getItem(`contact-revealed-${contact.type}`) === 'true') {
+                    const element = document.querySelector(contact.selector);
+                    if (element && !element.classList.contains('revealed')) {
+                        element.classList.add('revealed');
+                        const valueElement = element.querySelector('.contact-value');
+                        if (valueElement) {
+                            valueElement.classList.remove('hidden');
+                            // 从href中提取联系方式
+                            const href = element.getAttribute('href') || element.getAttribute('onclick').match(/'([^']+)'/)[1];
+                            const value = href.split(':')[1];
+                            if (contact.type === 'tel' || contact.type === 'sms') {
+                                valueElement.textContent = formatPhone(value);
+                            } else {
+                                valueElement.textContent = value;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 主题切换
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        // 加载保存的主题
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-icon').textContent = '☀️';
+            }
+        });
+
+        // 时间显示
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('current-time').textContent = `🕐 ${timeString}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 访客计数器（每日重置）
+        function updateVisitorCount() {
+            const today = new Date().toDateString();
+            const savedDate = localStorage.getItem('visitorDate');
+            let count = localStorage.getItem('visitorCount') || 0;
+
+            // 如果日期变了，重置计数
+            if (savedDate !== today) {
+                count = 0;
+                localStorage.setItem('visitorDate', today);
+            }
+
+            count = parseInt(count) + 1;
+            localStorage.setItem('visitorCount', count);
+            document.getElementById('visitor-count').textContent = count;
+        }
+        updateVisitorCount();
+
+        // ========== 新功能：每日一言 ==========
+        const quotes = [
+            { text: "生活不是等待暴风雨过去，而是学会在雨中跳舞。", author: "佚名" },
+            { text: "成功不是终点，失败也不是终结，唯有勇气才是永恒。", author: "温斯顿·丘吉尔" },
+            { text: "你的时间有限，不要浪费在重复他人的生活上。", author: "史蒂夫·乔布斯" },
+            { text: "唯一限制我们实现明天的，是我们对今天的怀疑。", author: "富兰克林·罗斯福" },
+            { text: "不要问自己世界需要什么，问问是什么让你充满活力，然后去做。", author: "霍华德·瑟曼" },
+            { text: "成功的秘诀在于坚持自己的目标和信念。", author: "本杰明·迪斯雷利" },
+            { text: "人生最大的荣耀不在于从不跌倒，而在于每次跌倒后都能站起来。", author: "纳尔逊·曼德拉" },
+            { text: "相信你自己，你已经比你想象的更强大。", author: "佚名" },
+            { text: "每一个不曾起舞的日子，都是对生命的辜负。", author: "尼采" },
+            { text: "做你自己，因为别人都有人做了。", author: "奥斯卡·王尔德" },
+            { text: "梦想不会逃跑，会逃跑的永远都是自己。", author: "佚名" },
+            { text: "今天的努力，是为了明天的美好。", author: "佚名" },
+            { text: "保持热爱，奔赴山海。", author: "佚名" },
+            { text: "星光不问赶路人，时光不负有心人。", author: "佚名" },
+            { text: "愿你历尽千帆，归来仍是少年。", author: "佚名" }
+        ];
+
+        function refreshQuote() {
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quote-text').textContent = `"${randomQuote.text}"`;
+            document.getElementById('quote-author').textContent = `— ${randomQuote.author}`;
+        }
+
+        // 页面加载时显示一句
+        refreshQuote();
+
+        // ========== 新功能：倒计时 ==========
+        // 计算农历春节日期
+        function getSpringFestivalDate(year) {
+            // 2025-2035年的春节日期（农历正月初一对应的公历日期）
+            const springFestivals = {
+                2025: new Date(2025, 0, 29),  // 2025年1月29日
+                2026: new Date(2026, 1, 17),  // 2026年2月17日
+                2027: new Date(2027, 1, 6),   // 2027年2月6日
+                2028: new Date(2028, 0, 26),  // 2028年1月26日
+                2029: new Date(2029, 1, 13),  // 2029年2月13日
+                2030: new Date(2030, 1, 3),   // 2030年2月3日
+                2031: new Date(2031, 0, 23),  // 2031年1月23日
+                2032: new Date(2032, 1, 11),  // 2032年2月11日
+                2033: new Date(2033, 0, 31),  // 2033年1月31日
+                2034: new Date(2034, 1, 19),  // 2034年2月19日
+                2035: new Date(2035, 1, 8)    // 2035年2月8日
+            };
+            return springFestivals[year];
+        }
+
+        function updateCountdowns() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            // 计算距离春节的天数
+            let springFestival = getSpringFestivalDate(currentYear);
+            if (!springFestival || now > springFestival) {
+                springFestival = getSpringFestivalDate(currentYear + 1);
+            }
+
+            if (springFestival) {
+                const daysToSpring = Math.ceil((springFestival - now) / (1000 * 60 * 60 * 24));
+                document.getElementById('countdown-spring').textContent = `${daysToSpring} 天`;
+            } else {
+                document.getElementById('countdown-spring').textContent = '计算中...';
+            }
+
+            // 计算距离生日的天数
+            const birthday = new Date(currentConfig.birthday || '2000-01-01');
+            let nextBirthday = new Date(currentYear, birthday.getMonth(), birthday.getDate());
+            if (now > nextBirthday) {
+                nextBirthday = new Date(currentYear + 1, birthday.getMonth(), birthday.getDate());
+            }
+            const daysToBirthday = Math.ceil((nextBirthday - now) / (1000 * 60 * 60 * 24));
+            document.getElementById('countdown-birthday').textContent = `${daysToBirthday} 天`;
+        }
+
+        // 页面加载时更新倒计时
+        updateCountdowns();
+        // 每小时更新一次倒计时
+        setInterval(updateCountdowns, 3600000);
+
+        // 复制到剪贴板
+        function copyToClipboard(text) {
+            // 尝试使用现代API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification(`✅ 已复制: ${text}`);
+                }).catch(() => {
+                    showNotification(`📋 ${text}`);
+                });
+            } else {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showNotification(`✅ 已复制: ${text}`);
+                } catch (err) {
+                    showNotification(`📋 ${text}`);
+                }
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // 显示通知
+        function showNotification(message) {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(102, 126, 234, 0.95);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 600;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+                z-index: 3000;
+                animation: slideDown 0.3s ease-out;
+            `;
+
+            document.body.appendChild(notification);
+
+            // 3秒后移除
+            setTimeout(() => {
+                notification.style.animation = 'slideUp 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // 添加通知动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+            }
+            @keyframes slideUp {
+                from {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(-20px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 页面加载完成后的初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            // 应用保存的配置
+            applyConfig();
+
+            // 恢复联系方式显示状态
+            setTimeout(() => {
+                restoreContactStates();
+            }, 100);
+
+            // 加载保存的主题
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-icon').textContent = '☀️';
+            }
+
+            // 初始化高级交互功能
+            initParticleEffect();
+            init3DCardEffect();
+            initTypingEffect();
+            initAvatarEasterEgg();
+            initKonamiCode();
+            initScrollEffects();
+            initWeatherWidget();
+            initGreeting();
+            initStreak();
+            initMatrixRain();
+        });
+
+        // ========== 鼠标跟随粒子特效 ==========
+        function initParticleEffect() {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
+            let lastTime = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                const now = Date.now();
+                if (now - lastTime < 50) return; // 限制频率
+                lastTime = now;
+
+                createParticle(e.clientX, e.clientY, colors[Math.floor(Math.random() * colors.length)]);
+            });
+        }
+
+        function createParticle(x, y, color) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = Math.random() * 10 + 5;
+            particle.style.cssText = `
+                left: ${x - size/2}px;
+                top: ${y - size/2}px;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${color};
+                box-shadow: 0 0 ${size}px ${color};
+            `;
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 1000);
+        }
+
+        // ========== 3D卡片倾斜效果 ==========
+        function init3DCardEffect() {
+            const cards = document.querySelectorAll('.card-3d');
+
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+                });
+            });
+        }
+
+        // ========== 打字机效果 ==========
+        function initTypingEffect() {
+            const bioElement = document.querySelector('.bio');
+            const originalText = bioElement.textContent;
+
+            // 点击bio触发重新打字
+            bioElement.style.cursor = 'pointer';
+            bioElement.title = '点击重新播放打字效果';
+
+            bioElement.addEventListener('click', () => {
+                typeWriter(bioElement, originalText);
+            });
+        }
+
+        function typeWriter(element, text, speed = 50) {
+            element.textContent = '';
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            element.appendChild(cursor);
+
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.insertBefore(document.createTextNode(text.charAt(i)), cursor);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    // 打字完成后移除光标
+                    setTimeout(() => {
+                        if (cursor.parentNode) {
+                            cursor.parentNode.removeChild(cursor);
+                        }
+                    }, 2000);
+                }
+            }
+            type();
+        }
+
+        // ========== 头像点击彩蛋 ==========
+        let avatarClickCount = 0;
+        function initAvatarEasterEgg() {
+            const avatar = document.querySelector('.avatar');
+
+            avatar.style.cursor = 'pointer';
+            avatar.addEventListener('click', (e) => {
+                avatarClickCount++;
+
+                // 弹跳动画
+                avatar.classList.remove('clicked');
+                void avatar.offsetWidth; // 触发重绘
+                avatar.classList.add('clicked');
+
+                // 创建烟花效果
+                createFirework(e.clientX, e.clientY);
+
+                // 连续点击5次触发彩虹模式
+                if (avatarClickCount >= 5) {
+                    avatarClickCount = 0;
+                    document.body.classList.toggle('rainbow-mode');
+                    if (document.body.classList.contains('rainbow-mode')) {
+                        showNotification('🌈 彩虹模式已开启！再点5次关闭');
+                    } else {
+                        showNotification('🌈 彩虹模式已关闭');
+                    }
+                }
+            });
+        }
+
+        function createFirework(x, y) {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = x + 'px';
+            firework.style.top = y + 'px';
+
+            const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd'];
+            const particleCount = 12;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'firework-particle';
+                const angle = (i / particleCount) * Math.PI * 2;
+                const distance = 50 + Math.random() * 50;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                particle.style.cssText = `
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    --tx: ${tx}px;
+                    --ty: ${ty}px;
+                `;
+                firework.appendChild(particle);
+            }
+
+            document.body.appendChild(firework);
+
+            setTimeout(() => {
+                if (firework.parentNode) {
+                    firework.parentNode.removeChild(firework);
+                }
+            }, 1000);
+        }
+
+        // ========== Konami Code 秘籍彩蛋 ==========
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+
+        function initKonamiCode() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === konamiCode[konamiIndex]) {
+                    konamiIndex++;
+                    if (konamiIndex === konamiCode.length) {
+                        activateKonamiEasterEgg();
+                        konamiIndex = 0;
+                    }
+                } else {
+                    konamiIndex = 0;
+                }
+            });
+        }
+
+        function activateKonamiEasterEgg() {
+            showNotification('🎮 Konami Code 激活！你发现了隐藏彩蛋！');
+
+            // 创建大量烟花
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    createFirework(x, y);
+                }, i * 200);
+            }
+
+            // 页面抖动效果
+            document.body.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                document.body.style.animation = '';
+            }, 500);
+        }
+
+        // ========== 滚动效果 ==========
+        function initScrollEffects() {
+            const progressBar = document.getElementById('scroll-progress');
+            const backToTop = document.getElementById('back-to-top');
+
+            window.addEventListener('scroll', () => {
+                // 更新进度条
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = (scrollTop / docHeight) * 100;
+                progressBar.style.width = progress + '%';
+
+                // 显示/隐藏返回顶部按钮
+                if (scrollTop > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // ========== 天气小组件 ==========
+        function initWeatherWidget() {
+            // 尝试获取用户位置并获取真实天气
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        fetchWeather(position.coords.latitude, position.coords.longitude);
+                    },
+                    (error) => {
+                        console.log('无法获取位置，使用IP定位');
+                        fetchWeatherByIP();
+                    }
+                );
+            } else {
+                fetchWeatherByIP();
+            }
+        }
+
+        // 通过IP获取天气（使用免费API）
+        async function fetchWeatherByIP() {
+            try {
+                // 使用 wttr.in 免费天气API（无需API key）
+                const response = await fetch('https://wttr.in/?format=j1');
+                const data = await response.json();
+
+                const current = data.current_condition[0];
+                const temp = current.temp_C;
+                const desc = getWeatherDescCN(current.weatherCode);
+                const icon = getWeatherIcon(current.weatherCode);
+
+                updateWeatherDisplay(icon, temp, desc, data.nearest_area[0].areaName[0].value);
+            } catch (error) {
+                console.log('天气获取失败，使用备用方案');
+                fetchWeatherFallback();
+            }
+        }
+
+        // 通过经纬度获取天气
+        async function fetchWeather(lat, lon) {
+            try {
+                // 使用 Open-Meteo 免费API（无需API key）
+                const response = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`
+                );
+                const data = await response.json();
+
+                const temp = Math.round(data.current.temperature_2m);
+                const weatherCode = data.current.weather_code;
+                const icon = getWeatherIconFromCode(weatherCode);
+                const desc = getWeatherDescFromCode(weatherCode);
+
+                updateWeatherDisplay(icon, temp, desc, '当前位置');
+            } catch (error) {
+                console.log('天气获取失败，尝试备用方案');
+                fetchWeatherByIP();
+            }
+        }
+
+        // 备用天气方案
+        function fetchWeatherFallback() {
+            // 根据月份和时间估算天气
+            const month = new Date().getMonth() + 1;
+            const hour = new Date().getHours();
+
+            let temp, icon, desc;
+
+            // 根据月份估算温度
+            if (month >= 12 || month <= 2) {
+                temp = Math.floor(Math.random() * 10) - 5; // 冬天 -5~5
+                icon = temp < 0 ? '❄️' : '🌨️';
+                desc = temp < 0 ? '寒冷' : '阴冷';
+            } else if (month >= 3 && month <= 5) {
+                temp = Math.floor(Math.random() * 15) + 10; // 春天 10~25
+                icon = '🌸';
+                desc = '春暖花开';
+            } else if (month >= 6 && month <= 8) {
+                temp = Math.floor(Math.random() * 10) + 25; // 夏天 25~35
+                icon = hour >= 6 && hour < 18 ? '☀️' : '🌙';
+                desc = temp > 30 ? '炎热' : '温暖';
+            } else {
+                temp = Math.floor(Math.random() * 15) + 10; // 秋天 10~25
+                icon = '🍂';
+                desc = '秋高气爽';
+            }
+
+            updateWeatherDisplay(icon, temp, desc, '估算');
+        }
+
+        // 更新天气显示
+        function updateWeatherDisplay(icon, temp, desc, location) {
+            document.getElementById('weather-icon').textContent = icon;
+            document.getElementById('weather-temp').textContent = temp + '°C';
+            document.getElementById('weather-desc').textContent = desc + (location ? ` · ${location}` : '');
+        }
+
+        // Open-Meteo 天气代码转图标
+        function getWeatherIconFromCode(code) {
+            const iconMap = {
+                0: '☀️',      // 晴
+                1: '🌤️',     // 大部晴朗
+                2: '⛅',      // 部分多云
+                3: '☁️',      // 阴天
+                45: '🌫️',    // 雾
+                48: '🌫️',    // 雾凇
+                51: '🌦️',    // 小毛毛雨
+                53: '🌦️',    // 毛毛雨
+                55: '🌧️',    // 大毛毛雨
+                61: '🌧️',    // 小雨
+                63: '🌧️',    // 中雨
+                65: '🌧️',    // 大雨
+                66: '🌨️',    // 冻雨
+                67: '🌨️',    // 大冻雨
+                71: '🌨️',    // 小雪
+                73: '❄️',     // 中雪
+                75: '❄️',     // 大雪
+                77: '🌨️',    // 雪粒
+                80: '🌦️',    // 小阵雨
+                81: '🌧️',    // 中阵雨
+                82: '⛈️',     // 大阵雨
+                85: '🌨️',    // 小阵雪
+                86: '❄️',     // 大阵雪
+                95: '⛈️',     // 雷暴
+                96: '⛈️',     // 雷暴+小冰雹
+                99: '⛈️'      // 雷暴+大冰雹
+            };
+            return iconMap[code] || '🌡️';
+        }
+
+        // Open-Meteo 天气代码转中文描述
+        function getWeatherDescFromCode(code) {
+            const descMap = {
+                0: '晴朗',
+                1: '大部晴朗',
+                2: '部分多云',
+                3: '阴天',
+                45: '有雾',
+                48: '雾凇',
+                51: '小毛毛雨',
+                53: '毛毛雨',
+                55: '大毛毛雨',
+                61: '小雨',
+                63: '中雨',
+                65: '大雨',
+                66: '冻雨',
+                67: '大冻雨',
+                71: '小雪',
+                73: '中雪',
+                75: '大雪',
+                77: '雪粒',
+                80: '小阵雨',
+                81: '中阵雨',
+                82: '大阵雨',
+                85: '小阵雪',
+                86: '大阵雪',
+                95: '雷暴',
+                96: '雷暴+冰雹',
+                99: '强雷暴'
+            };
+            return descMap[code] || '未知';
+        }
+
+        // wttr.in 天气代码转图标
+        function getWeatherIcon(code) {
+            const codeNum = parseInt(code);
+            if (codeNum === 113) return '☀️';
+            if (codeNum === 116) return '⛅';
+            if (codeNum === 119 || codeNum === 122) return '☁️';
+            if (codeNum >= 176 && codeNum <= 263) return '🌦️';
+            if (codeNum >= 266 && codeNum <= 314) return '🌧️';
+            if (codeNum >= 317 && codeNum <= 395) return '❄️';
+            if (codeNum >= 200 && codeNum <= 232) return '⛈️';
+            return '🌡️';
+        }
+
+        // wttr.in 天气代码转中文
+        function getWeatherDescCN(code) {
+            const codeNum = parseInt(code);
+            if (codeNum === 113) return '晴朗';
+            if (codeNum === 116) return '部分多云';
+            if (codeNum === 119) return '多云';
+            if (codeNum === 122) return '阴天';
+            if (codeNum === 143 || codeNum === 248 || codeNum === 260) return '有雾';
+            if (codeNum >= 176 && codeNum <= 185) return '有阵雨';
+            if (codeNum >= 200 && codeNum <= 232) return '雷暴';
+            if (codeNum >= 263 && codeNum <= 284) return '毛毛雨';
+            if (codeNum >= 293 && codeNum <= 314) return '下雨';
+            if (codeNum >= 317 && codeNum <= 338) return '下雪';
+            if (codeNum >= 350 && codeNum <= 377) return '冰雹';
+            if (codeNum >= 386 && codeNum <= 395) return '雷阵雨';
+            return '未知天气';
+        }
+
+        // ========== 时间问候语 ==========
+        function initGreeting() {
+            const hour = new Date().getHours();
+            const greetingEl = document.getElementById('greeting');
+            let greeting, emoji;
+
+            if (hour >= 5 && hour < 9) {
+                greeting = '早上好';
+                emoji = '🌅';
+            } else if (hour >= 9 && hour < 12) {
+                greeting = '上午好';
+                emoji = '☀️';
+            } else if (hour >= 12 && hour < 14) {
+                greeting = '中午好';
+                emoji = '🌞';
+            } else if (hour >= 14 && hour < 18) {
+                greeting = '下午好';
+                emoji = '🌤️';
+            } else if (hour >= 18 && hour < 22) {
+                greeting = '晚上好';
+                emoji = '🌙';
+            } else {
+                greeting = '夜深了';
+                emoji = '🌃';
+            }
+
+            greetingEl.textContent = `${emoji} ${greeting}，欢迎来访！`;
+        }
+
+        // ========== 连续访问天数 ==========
+        function initStreak() {
+            const today = new Date().toDateString();
+            const lastVisit = localStorage.getItem('lastVisitDate');
+            let streak = parseInt(localStorage.getItem('visitStreak')) || 0;
+
+            if (lastVisit) {
+                const lastDate = new Date(lastVisit);
+                const todayDate = new Date(today);
+                const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                    // 今天已经访问过，保持streak不变
+                } else if (diffDays === 1) {
+                    // 连续访问
+                    streak++;
+                    localStorage.setItem('visitStreak', streak);
+
+                    // 检查成就
+                    checkStreakAchievement(streak);
+                } else {
+                    // 断签了，重置
+                    streak = 1;
+                    localStorage.setItem('visitStreak', streak);
+                }
+            } else {
+                // 首次访问
+                streak = 1;
+                localStorage.setItem('visitStreak', streak);
+            }
+
+            localStorage.setItem('lastVisitDate', today);
+            document.getElementById('streak-count').textContent = streak;
+
+            // 点击徽章显示详情
+            document.getElementById('streak-badge').addEventListener('click', () => {
+                showNotification(`🔥 你已连续访问 ${streak} 天！继续保持！`);
+            });
+        }
+
+        function checkStreakAchievement(streak) {
+            const achievements = [
+                { days: 3, icon: '🌟', title: '初露锋芒', desc: '连续访问3天' },
+                { days: 7, icon: '⭐', title: '坚持一周', desc: '连续访问7天' },
+                { days: 14, icon: '🏆', title: '两周达人', desc: '连续访问14天' },
+                { days: 30, icon: '👑', title: '月度冠军', desc: '连续访问30天' },
+                { days: 100, icon: '💎', title: '百日传奇', desc: '连续访问100天' }
+            ];
+
+            const achievement = achievements.find(a => a.days === streak);
+            if (achievement) {
+                showAchievement(achievement.icon, achievement.title, achievement.desc);
+            }
+        }
+
+        function showAchievement(icon, title, desc) {
+            const achievementEl = document.createElement('div');
+            achievementEl.className = 'achievement';
+            achievementEl.innerHTML = `
+                <div class="achievement-icon">${icon}</div>
+                <div class="achievement-title">${title}</div>
+                <div class="achievement-desc">${desc}</div>
+            `;
+            document.body.appendChild(achievementEl);
+
+            // 3秒后移除
+            setTimeout(() => {
+                achievementEl.style.animation = 'achievementPop 0.3s ease-in reverse';
+                setTimeout(() => {
+                    if (achievementEl.parentNode) {
+                        achievementEl.parentNode.removeChild(achievementEl);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // ========== 点击小游戏 ==========
+        let gameActive = false;
+        let gameScore = 0;
+        let gameTimer = null;
+        let gameTimeLeft = 10;
+
+        function handleGameClick() {
+            if (!gameActive) {
+                startGame();
+            } else {
+                gameScore++;
+                document.getElementById('click-score').textContent = gameScore;
+
+                // 点击特效
+                const btn = document.getElementById('click-btn');
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 50);
+            }
+        }
+
+        function startGame() {
+            gameActive = true;
+            gameScore = 0;
+            gameTimeLeft = 10;
+            document.getElementById('click-score').textContent = '0';
+            document.getElementById('click-btn').textContent = '👊';
+
+            gameTimer = setInterval(() => {
+                gameTimeLeft--;
+                document.getElementById('click-timer').textContent = `剩余时间: ${gameTimeLeft} 秒`;
+
+                if (gameTimeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(gameTimer);
+            gameActive = false;
+            document.getElementById('click-btn').textContent = '👆';
+
+            // 保存最高分
+            const highScore = parseInt(localStorage.getItem('clickHighScore')) || 0;
+            let message = `游戏结束！得分: ${gameScore}`;
+
+            if (gameScore > highScore) {
+                localStorage.setItem('clickHighScore', gameScore);
+                message += ` 🎉 新纪录！`;
+                showAchievement('🏅', '新纪录！', `你的最高分: ${gameScore} 次/10秒`);
+            } else {
+                message += ` (最高: ${highScore})`;
+            }
+
+            document.getElementById('click-timer').textContent = message;
+            showNotification(message);
+
+            // 根据分数给予评价
+            setTimeout(() => {
+                let rating;
+                if (gameScore >= 100) rating = '🔥 超神！你是点击之王！';
+                else if (gameScore >= 80) rating = '⚡ 太强了！手速惊人！';
+                else if (gameScore >= 60) rating = '👍 不错！继续加油！';
+                else if (gameScore >= 40) rating = '😊 还可以，再试试？';
+                else rating = '💪 加油，你可以更快！';
+
+                document.getElementById('click-timer').textContent = rating + ' 点击重新开始';
+            }, 2000);
+        }
+
+        // ========== Matrix代码雨彩蛋 ==========
+        let matrixActive = false;
+        let matrixAnimation = null;
+
+        function initMatrixRain() {
+            const canvas = document.getElementById('matrix-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // 设置画布大小
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Matrix字符
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -100;
+            }
+
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#0f0';
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const char = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            // 双击页面触发Matrix效果
+            document.addEventListener('dblclick', (e) => {
+                // 排除按钮和链接的双击
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
+
+                if (!matrixActive) {
+                    canvas.classList.add('active');
+                    matrixActive = true;
+                    matrixAnimation = setInterval(drawMatrix, 33);
+                    showNotification('🖥️ Matrix模式已开启！双击关闭');
+                } else {
+                    canvas.classList.remove('active');
+                    matrixActive = false;
+                    clearInterval(matrixAnimation);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    showNotification('🖥️ Matrix模式已关闭');
+                }
+            });
+        }
+
+        // 添加抖动动画样式
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+                20%, 40%, 60%, 80% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(shakeStyle);
+
+        // ========== 自定义光标 ==========
+        function initCustomCursor() {
+            const cursor = document.createElement('div');
+            cursor.className = 'custom-cursor';
+            document.body.appendChild(cursor);
+
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+
+            document.addEventListener('mousedown', () => {
+                cursor.classList.add('clicking');
+            });
+
+            document.addEventListener('mouseup', () => {
+                cursor.classList.remove('clicking');
+            });
+
+            // 悬浮在可点击元素上时变大
+            const clickables = document.querySelectorAll('a, button, .social-link, .contact-link, .skill-tag');
+            clickables.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+            });
+        }
+
+        // ========== 彩带/纸屑效果 ==========
+        function createConfetti(count = 50) {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3'];
+            const shapes = ['■', '●', '▲', '★', '♦', '♥'];
+
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+                    confetti.style.cssText = `
+                        left: ${Math.random() * 100}vw;
+                        top: -20px;
+                        color: ${colors[Math.floor(Math.random() * colors.length)]};
+                        font-size: ${Math.random() * 20 + 10}px;
+                        animation-duration: ${Math.random() * 2 + 2}s;
+                    `;
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.parentNode.removeChild(confetti);
+                        }
+                    }, 4000);
+                }, i * 30);
+            }
+        }
+
+        // ========== 浮动提示 ==========
+        function showFloatingTip() {
+            const tips = [
+                '💡 双击页面可开启Matrix模式',
+                '🎮 试试点击挑战小游戏',
+                '🌈 连续点击头像5次有惊喜',
+                '⌨️ 输入↑↑↓↓←→←→BA试试',
+                '🔥 每天来访可累积连续天数',
+                '🎨 点击简介可重播打字效果'
+            ];
+
+            // 检查是否已显示过
+            const lastTipTime = localStorage.getItem('lastTipTime');
+            const now = Date.now();
+            if (lastTipTime && now - parseInt(lastTipTime) < 3600000) return;
+
+            const tip = document.createElement('div');
+            tip.className = 'floating-tip';
+            tip.textContent = tips[Math.floor(Math.random() * tips.length)];
+            tip.onclick = () => {
+                tip.style.animation = 'floatTip 0.3s ease-out reverse';
+                setTimeout(() => {
+                    if (tip.parentNode) tip.parentNode.removeChild(tip);
+                }, 300);
+                localStorage.setItem('lastTipTime', now.toString());
+            };
+
+            document.body.appendChild(tip);
+
+            setTimeout(() => {
+                if (tip.parentNode) {
+                    tip.style.animation = 'floatTip 0.3s ease-out reverse';
+                    setTimeout(() => {
+                        if (tip.parentNode) tip.parentNode.removeChild(tip);
+                    }, 300);
+                }
+            }, 10000);
+        }
+
+        // ========== 页面加载动画 ==========
+        function showPageTransition() {
+            const transition = document.createElement('div');
+            transition.className = 'page-transition';
+            transition.innerHTML = '<div class="loader">⚡</div>';
+            document.body.appendChild(transition);
+
+            setTimeout(() => {
+                if (transition.parentNode) {
+                    transition.parentNode.removeChild(transition);
+                }
+            }, 1000);
+        }
+
+        // ========== 键盘快捷键 ==========
+        function initKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // 按 C 触发彩带
+                if (e.key === 'c' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    createConfetti(30);
+                    showNotification('🎉 彩带特效！');
+                }
+
+                // 按 H 显示帮助
+                if (e.key === 'h' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    showNotification('快捷键: C=彩带 | H=帮助 | 双击=Matrix');
+                }
+            });
+        }
+
+        // ========== 页面可见性变化 ==========
+        function initVisibilityChange() {
+            let leaveTime = 0;
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    leaveTime = Date.now();
+                    document.title = '👋 别走啊~ | 我的个人主页';
+                } else {
+                    document.title = '我的个人主页';
+                    const awayTime = Date.now() - leaveTime;
+
+                    if (awayTime > 60000) {
+                        showNotification('🎉 欢迎回来！想你了~');
+                        createConfetti(20);
+                    } else if (awayTime > 10000) {
+                        showNotification('👋 欢迎回来！');
+                    }
+                }
+            });
+        }
+
+        // ========== 初始化所有新功能 ==========
+        window.addEventListener('load', () => {
+            showPageTransition();
+
+            setTimeout(() => {
+                initCustomCursor();
+                initKeyboardShortcuts();
+                initVisibilityChange();
+                setTimeout(showFloatingTip, 3000);
+            }, 500);
+        });
+
+        // ========== 首次访问欢迎 ==========
+        if (!localStorage.getItem('hasVisited')) {
+            localStorage.setItem('hasVisited', 'true');
+            setTimeout(() => {
+                showNotification('🎉 欢迎首次访问！探索页面发现更多彩蛋~');
+                createConfetti(50);
+            }, 1500);
+        }
+    </script>
 </body>
 </html>
