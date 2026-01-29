@@ -1481,10 +1481,10 @@
                     <span id="preview-emoji">👨‍💻</span>
                     <img id="preview-image" style="display: none;">
                 </div>
-                <div id="image-input-container" style="display: flex; gap: 8px;">
+                <div id="image-input-container" style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <input type="file" id="avatar-file-input" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
                     <button class="upload-btn" onclick="document.getElementById('avatar-file-input').click()">📁 选择图片</button>
-                    <button class="upload-btn" onclick="removeAvatar()" style="background: rgba(239, 68, 68, 0.2); border-color: #dc2626; color: #dc2626;">🗑️ 移除图片</button>
+                    <button class="upload-btn" onclick="removeAvatar()" style="background: rgba(102, 126, 234, 0.2); border-color: #667eea; color: #667eea;">🔄 恢复默认</button>
                 </div>
             </div>
 
@@ -1544,7 +1544,7 @@
     <div class="container">
         <!-- 个人信息卡片 -->
         <div class="profile-card">
-            <div class="avatar">👨‍💻</div>
+            <div class="avatar"><img src="0452193ac44fb409758a091f56f54bdf.png" alt="头像"></div>
             <div class="greeting" id="greeting">👋 你好</div>
             <h1>Hi, 我是 YJX</h1>
             <p class="bio">
@@ -1560,7 +1560,7 @@
 
             <!-- 社交链接 -->
             <div class="social-links">
-                <a class="social-link" href="https://github.com" target="_blank" title="GitHub">
+                <a class="social-link" href="https://github.com/yjx-git001" target="_blank" title="GitHub">
                     <div class="social-icon">🐙</div>
                     <span class="social-label">GitHub</span>
                 </a>
@@ -1699,23 +1699,33 @@
         // 默认配置
         const defaultConfig = {
             name: 'YJX',
-            avatarImage: null, // base64图片数据
+            avatarImage: '0452193ac44fb409758a091f56f54bdf.png', // 头像图片路径
             bio: '一个热爱编程的开发者 | 喜欢探索新技术 | 永远保持好奇心',
             status: '可以联系',
             phone: '18325666364',
             email: '3307852286@qq.com',
-            github: 'https://github.com',
+            github: 'https://github.com/yjx-git001',
             wechat: '微信号',
             qq: 'QQ号',
             bilibili: 'B站',
-            skills: ['JavaScript', 'Python', 'HTML/CSS', 'React', 'Node.js', 'Git', 'Vue', 'TypeScript'],
-            birthday: '2000-01-01', // 生日
+            skills: ['JavaScript', 'Python', 'HTML/CSS', 'React', 'Node.js', 'Git', 'Vue', 'TypeScript', 'Go', 'Gin'],
+            birthday: '2002-06-13', // 生日
         };
 
         // 加载配置
         function loadConfig() {
             const saved = localStorage.getItem('pageConfig');
-            return saved ? JSON.parse(saved) : defaultConfig;
+            if (saved) {
+                const savedConfig = JSON.parse(saved);
+                // 默认配置优先，但头像允许用户自定义
+                const merged = { ...savedConfig, ...defaultConfig };
+                // 如果用户上传了自定义头像（base64格式），使用用户的头像
+                if (savedConfig.avatarImage && savedConfig.avatarImage.startsWith('data:')) {
+                    merged.avatarImage = savedConfig.avatarImage;
+                }
+                return merged;
+            }
+            return { ...defaultConfig };
         }
 
         // 保存配置
@@ -1867,13 +1877,13 @@
             reader.readAsDataURL(file);
         }
 
-        // 移除头像图片
+        // 移除头像图片（恢复默认头像）
         function removeAvatar() {
-            if (confirm('确定要移除头像图片吗？')) {
-                currentConfig.avatarImage = null;
+            if (confirm('确定要恢复默认头像吗？')) {
+                currentConfig.avatarImage = defaultConfig.avatarImage;
                 document.getElementById('avatar-file-input').value = '';
                 updateAvatarPreview();
-                showNotification('✅ 头像图片已移除');
+                showNotification('✅ 已恢复默认头像');
             }
         }
 
@@ -1940,7 +1950,6 @@
         function resetSettings() {
             if (confirm('确定要恢复默认设置吗？这将清除所有自定义内容。')) {
                 currentConfig = { ...defaultConfig };
-                currentConfig.avatarImage = null;
                 saveConfig(currentConfig);
                 applyConfig();
                 loadSettingsToForm();
