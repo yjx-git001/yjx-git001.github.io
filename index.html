@@ -241,6 +241,218 @@
             margin-bottom: 20px;
         }
 
+        /* 下班倒计时卡片 */
+        .work-countdown-card {
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            width: 320px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 30px 24px;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.5);
+            animation: fadeInRight 0.8s ease-out, pulse-glow 3s ease-in-out infinite;
+            text-align: center;
+            overflow: hidden;
+            z-index: 999;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .work-countdown-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 20px 60px rgba(102, 126, 234, 0.5); }
+            50% { box-shadow: 0 20px 80px rgba(102, 126, 234, 0.8); }
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        body.dark-mode .work-countdown-card {
+            background: linear-gradient(135deg, #4c51bf 0%, #553c9a 100%);
+        }
+
+        .countdown-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: bounce 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .countdown-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .countdown-time {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .time-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 12px 10px;
+            min-width: 70px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .time-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .time-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .time-separator {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            opacity: 0.8;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .countdown-status {
+            font-size: 13px;
+            color: white;
+            font-weight: 600;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .work-countdown-card.off-work {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        body.dark-mode .work-countdown-card.off-work {
+            background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+        }
+
+        .work-countdown-card.weekend {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        body.dark-mode .work-countdown-card.weekend {
+            background: linear-gradient(135deg, #c05621 0%, #9c4221 100%);
+        }
+
+        @media (max-width: 1200px) {
+            .work-countdown-card {
+                right: 10px;
+                width: 280px;
+                padding: 24px 20px;
+            }
+
+            .time-block {
+                min-width: 60px;
+                padding: 10px 8px;
+            }
+
+            .time-value {
+                font-size: 28px;
+            }
+
+            .countdown-status {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .work-countdown-card {
+                position: relative;
+                right: auto;
+                top: auto;
+                width: 100%;
+                margin-bottom: 20px;
+                padding: 30px 20px;
+            }
+
+            .countdown-icon {
+                font-size: 48px;
+            }
+
+            .countdown-title {
+                font-size: 20px;
+            }
+
+            .time-block {
+                min-width: 70px;
+                padding: 12px 16px;
+            }
+
+            .time-value {
+                font-size: 36px;
+            }
+
+            .time-separator {
+                font-size: 28px;
+            }
+
+            .countdown-status {
+                font-size: 14px;
+            }
+        }
+
         .card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -1199,8 +1411,8 @@
             color: #a0aec0;
         }
 
-        /* Matrix代码雨 */
-        .matrix-canvas {
+        /* 星空背景 */
+        .starfield {
             position: fixed;
             top: 0;
             left: 0;
@@ -1210,10 +1422,260 @@
             z-index: 9997;
             opacity: 0;
             transition: opacity 0.5s;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
         }
 
-        .matrix-canvas.active {
+        .starfield.active {
             opacity: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, white, transparent);
+            animation: shoot 1s ease-out forwards;
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(300px) translateY(300px);
+                opacity: 0;
+            }
+        }
+
+        /* AI聊天窗口 */
+        .ai-chat-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .ai-chat-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .ai-chat-window {
+            position: fixed;
+            bottom: 180px;
+            right: 30px;
+            width: 380px;
+            max-width: calc(100vw - 60px);
+            height: 500px;
+            max-height: calc(100vh - 220px);
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+            overflow: hidden;
+        }
+
+        body.dark-mode .ai-chat-window {
+            background: rgba(45, 55, 72, 0.98);
+        }
+
+        .ai-chat-window.open {
+            display: flex;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-chat-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-chat-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .ai-chat-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .ai-chat-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .ai-message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message.assistant {
+            align-self: flex-start;
+            background: rgba(102, 126, 234, 0.1);
+            color: #2d3748;
+            border-bottom-left-radius: 4px;
+        }
+
+        body.dark-mode .ai-message.assistant {
+            background: rgba(102, 126, 234, 0.2);
+            color: #e2e8f0;
+        }
+
+        .ai-message.typing {
+            display: flex;
+            gap: 4px;
+            padding: 16px;
+        }
+
+        .ai-message.typing span {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typing 1s ease-in-out infinite;
+        }
+
+        .ai-message.typing span:nth-child(2) { animation-delay: 0.2s; }
+        .ai-message.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .ai-chat-input {
+            padding: 16px;
+            border-top: 1px solid rgba(102, 126, 234, 0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .ai-chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .ai-chat-input input:focus {
+            border-color: #667eea;
+        }
+
+        body.dark-mode .ai-chat-input input {
+            background: rgba(45, 55, 72, 0.5);
+            color: #e2e8f0;
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .ai-chat-input button {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        .ai-chat-input button:hover {
+            transform: scale(1.05);
+        }
+
+        .ai-chat-input button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* AI设置面板 */
+        .ai-settings-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 2001;
+            padding: 24px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .ai-settings-panel.open {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        body.dark-mode .ai-settings-panel {
+            background: rgba(45, 55, 72, 0.98);
         }
 
         /* 成就徽章 */
@@ -1555,6 +2017,29 @@
             </div>
         </div>
 
+        <!-- 下班倒计时卡片 -->
+        <div class="work-countdown-card" id="work-countdown-card">
+            <div class="countdown-icon">⏰</div>
+            <div class="countdown-title" id="countdown-title">距离下班还有</div>
+            <div class="countdown-time">
+                <div class="time-block">
+                    <span class="time-value" id="hours">00</span>
+                    <span class="time-label">小时</span>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-block">
+                    <span class="time-value" id="minutes">00</span>
+                    <span class="time-label">分钟</span>
+                </div>
+                <div class="time-separator">:</div>
+                <div class="time-block">
+                    <span class="time-value" id="seconds">00</span>
+                    <span class="time-label">秒</span>
+                </div>
+            </div>
+            <div class="countdown-status" id="countdown-status">加油！坚持就是胜利 💪</div>
+        </div>
+
         <!-- 功能卡片网格 -->
         <div class="cards-grid">
             <!-- 联系方式卡片 -->
@@ -1663,11 +2148,68 @@
             </div>
         </div>
 
-        <!-- Matrix代码雨画布 -->
-        <canvas class="matrix-canvas" id="matrix-canvas"></canvas>
+        <!-- 星空背景容器 -->
+        <div class="starfield" id="starfield"></div>
 
         <div class="footer">
             Made with ❤️ by YJX | © 2026
+        </div>
+    </div>
+
+    <!-- AI聊天按钮 -->
+    <button class="ai-chat-btn" id="ai-chat-btn" onclick="toggleAIChat()" title="AI助手">🤖</button>
+
+    <!-- AI聊天窗口 -->
+    <div class="ai-chat-window" id="ai-chat-window">
+        <div class="ai-chat-header">
+            <h3>🤖 AI助手</h3>
+            <div style="display: flex; gap: 8px;">
+                <button class="ai-chat-close" onclick="openAISettings()" title="API设置">⚙️</button>
+                <button class="ai-chat-close" onclick="toggleAIChat()">✕</button>
+            </div>
+        </div>
+        <div class="ai-chat-messages" id="ai-chat-messages">
+            <div class="ai-message assistant">你好！Mr Yin，有什么可以帮你的吗？</div>
+        </div>
+        <div class="ai-chat-input">
+            <input type="text" id="ai-input" placeholder="输入消息..." onkeypress="handleAIInputKeypress(event)">
+            <button id="ai-send-btn" onclick="sendAIMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- AI设置弹窗 -->
+    <div class="settings-overlay" id="ai-settings-overlay" onclick="closeAISettings()"></div>
+    <div class="ai-settings-panel" id="ai-settings-panel">
+        <div class="settings-header">
+            <h2 class="settings-title">🤖 AI配置</h2>
+            <button class="close-btn" onclick="closeAISettings()">✕</button>
+        </div>
+        <div id="ai-panel-locked" style="text-align: center; padding: 40px 20px;">
+            <p style="font-size: 48px; margin-bottom: 20px;">🔒</p>
+            <p style="font-size: 14px; color: #718096; margin-bottom: 20px;">需要密码才能查看和修改API配置</p>
+            <button class="save-btn" onclick="unlockAIPanel()">🔓 输入密码解锁</button>
+        </div>
+        <div id="ai-panel-unlocked" style="display: none;">
+            <div class="settings-section">
+                <label class="settings-label">AI 模型</label>
+                <select class="settings-input" id="ai-setting-model" onchange="onAIModelChange()" style="margin-bottom: 12px;">
+                    <option value="deepseek">DeepSeek</option>
+                    <option value="claude">Claude</option>
+                    <option value="custom">自定义</option>
+                </select>
+                <label class="settings-label">API Base URL</label>
+                <input type="text" class="settings-input" id="ai-setting-url" placeholder="https://api.deepseek.com">
+                <label class="settings-label">模型名称</label>
+                <input type="text" class="settings-input" id="ai-setting-model-name" placeholder="deepseek-chat" style="margin-bottom: 12px;">
+                <label class="settings-label">API Key</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <input type="password" class="settings-input" id="ai-setting-key" placeholder="sk-xxxxxxxx" style="flex: 1; margin-bottom: 0;">
+                    <button class="upload-btn" onclick="toggleAIKeyVisibility()">👁️</button>
+                </div>
+                <p style="font-size: 11px; color: #e53e3e; margin-bottom: 16px;">⚠️ API Key会保存在浏览器中，请勿在公共设备上使用</p>
+            </div>
+            <button class="save-btn" onclick="saveAISettings()">💾 保存配置</button>
+            <button class="reset-btn" onclick="resetAISettings()">🔄 恢复默认</button>
         </div>
     </div>
 
@@ -1686,6 +2228,17 @@
             bilibili: 'https://www.bilibili.com/',
             skills: ['JavaScript', 'Python', 'HTML/CSS', 'React', 'Node.js', 'Git', 'Vue', 'TypeScript', 'Go', 'Gin'],
             birthday: '2002-06-13', // 生日
+            aiProvider: 'deepseek', // AI提供商
+            apiUrl: 'https://api.deepseek.com', // AI API地址
+            apiKey: 'sk-1878f8e76b604a76a5eebfc2ccb741ef', // AI API Key
+            aiModelName: 'deepseek-chat', // AI模型名称
+        };
+
+        // AI提供商预设配置
+        const aiProviderPresets = {
+            deepseek: { url: 'https://api.deepseek.com', model: 'deepseek-chat' },
+            claude: { url: 'https://api.anthropic.com', model: 'claude-3-5-sonnet-20241022' },
+            custom: { url: '', model: '' }
         };
 
         // 加载配置
@@ -1936,7 +2489,104 @@
         // 页面加载时应用配置
         window.addEventListener('DOMContentLoaded', () => {
             applyConfig();
+            startWorkCountdown();
         });
+
+        // ========== 下班倒计时功能 ==========
+        function startWorkCountdown() {
+            updateWorkCountdown();
+            setInterval(updateWorkCountdown, 1000);
+        }
+
+        function updateWorkCountdown() {
+            const now = new Date();
+            const day = now.getDay(); // 0=周日, 1-5=周一到周五, 6=周六
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            const card = document.getElementById('work-countdown-card');
+            const title = document.getElementById('countdown-title');
+            const status = document.getElementById('countdown-status');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+
+            // 周末
+            if (day === 0 || day === 6) {
+                card.className = 'work-countdown-card weekend';
+                title.textContent = '周末愉快！';
+                hoursEl.textContent = '😊';
+                minutesEl.textContent = '休';
+                secondsEl.textContent = '息';
+                status.textContent = '好好享受周末时光吧！🎉';
+                return;
+            }
+
+            // 工作日
+            const workStart = 9; // 上班时间 9:00
+            const workEnd = 18; // 下班时间 18:00
+
+            // 还没上班
+            if (hours < workStart) {
+                card.className = 'work-countdown-card';
+                title.textContent = '距离上班还有';
+
+                const targetTime = new Date(now);
+                targetTime.setHours(workStart, 0, 0, 0);
+                const diff = Math.floor((targetTime - now) / 1000);
+
+                const h = Math.floor(diff / 3600);
+                const m = Math.floor((diff % 3600) / 60);
+                const s = diff % 60;
+
+                hoursEl.textContent = String(h).padStart(2, '0');
+                minutesEl.textContent = String(m).padStart(2, '0');
+                secondsEl.textContent = String(s).padStart(2, '0');
+                status.textContent = '再睡一会儿吧~ 😴';
+            }
+            // 工作时间
+            else if (hours < workEnd || (hours === workEnd && minutes === 0 && seconds === 0)) {
+                card.className = 'work-countdown-card';
+                title.textContent = '距离下班还有';
+
+                const targetTime = new Date(now);
+                targetTime.setHours(workEnd, 0, 0, 0);
+                const diff = Math.floor((targetTime - now) / 1000);
+
+                const h = Math.floor(diff / 3600);
+                const m = Math.floor((diff % 3600) / 60);
+                const s = diff % 60;
+
+                hoursEl.textContent = String(h).padStart(2, '0');
+                minutesEl.textContent = String(m).padStart(2, '0');
+                secondsEl.textContent = String(s).padStart(2, '0');
+
+                // 根据剩余时间显示不同的鼓励语
+                if (h >= 6) {
+                    status.textContent = '加油！新的一天开始了 💪';
+                } else if (h >= 3) {
+                    status.textContent = '继续努力！已经过半了 🔥';
+                } else if (h >= 1) {
+                    status.textContent = '坚持住！马上就要下班了 ⏰';
+                } else if (m >= 30) {
+                    status.textContent = '最后冲刺！还有不到一小时 🚀';
+                } else if (m >= 10) {
+                    status.textContent = '胜利在望！再坚持一下 🎯';
+                } else {
+                    status.textContent = '倒计时！准备下班啦 🎉';
+                }
+            }
+            // 已经下班
+            else {
+                card.className = 'work-countdown-card off-work';
+                title.textContent = '已经下班啦！';
+                hoursEl.textContent = '🎉';
+                minutesEl.textContent = '下';
+                secondsEl.textContent = '班';
+                status.textContent = '辛苦了！好好休息吧~ 😊';
+            }
+        }
 
         // 联系方式显示功能
         function revealContact(element, href, contactValue) {
@@ -2246,7 +2896,7 @@
             initWeatherWidget();
             initGreeting();
             initStreak();
-            initMatrixRain();
+            initStarfield();
         });
 
         // ========== 鼠标跟随粒子特效 ==========
@@ -2843,66 +3493,66 @@
             }, 2000);
         }
 
-        // ========== Matrix代码雨彩蛋 ==========
-        let matrixActive = false;
-        let matrixAnimation = null;
+        // ========== 星空流星特效 ==========
+        let starfieldActive = false;
+        let shootingStarInterval = null;
 
-        function initMatrixRain() {
-            const canvas = document.getElementById('matrix-canvas');
-            const ctx = canvas.getContext('2d');
+        function initStarfield() {
+            const starfield = document.getElementById('starfield');
 
-            // 设置画布大小
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-
-            // Matrix字符
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-            const fontSize = 14;
-            const columns = canvas.width / fontSize;
-            const drops = [];
-
-            for (let i = 0; i < columns; i++) {
-                drops[i] = Math.random() * -100;
-            }
-
-            function drawMatrix() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#0f0';
-                ctx.font = fontSize + 'px monospace';
-
-                for (let i = 0; i < drops.length; i++) {
-                    const char = chars[Math.floor(Math.random() * chars.length)];
-                    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                        drops[i] = 0;
-                    }
-                    drops[i]++;
+            // 创建星星
+            function createStars() {
+                starfield.innerHTML = '';
+                const starCount = 150;
+                for (let i = 0; i < starCount; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    const size = Math.random() * 3 + 1;
+                    star.style.cssText = `
+                        left: ${Math.random() * 100}%;
+                        top: ${Math.random() * 100}%;
+                        width: ${size}px;
+                        height: ${size}px;
+                        animation-delay: ${Math.random() * 2}s;
+                    `;
+                    starfield.appendChild(star);
                 }
             }
 
-            // 双击页面触发Matrix效果
+            // 创建流星
+            function createShootingStar() {
+                const star = document.createElement('div');
+                star.className = 'shooting-star';
+                star.style.cssText = `
+                    left: ${Math.random() * 70}%;
+                    top: ${Math.random() * 50}%;
+                `;
+                starfield.appendChild(star);
+
+                setTimeout(() => {
+                    if (star.parentNode) {
+                        star.parentNode.removeChild(star);
+                    }
+                }, 1000);
+            }
+
+            // 双击页面触发星空效果
             document.addEventListener('dblclick', (e) => {
-                // 排除按钮和链接的双击
                 if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
 
-                if (!matrixActive) {
-                    canvas.classList.add('active');
-                    matrixActive = true;
-                    matrixAnimation = setInterval(drawMatrix, 33);
-                    showNotification('🖥️ Matrix模式已开启！双击关闭');
+                if (!starfieldActive) {
+                    createStars();
+                    starfield.classList.add('active');
+                    starfieldActive = true;
+                    shootingStarInterval = setInterval(createShootingStar, 2000);
+                    createShootingStar();
+                    showNotification('✨ 星空模式已开启！双击关闭');
                 } else {
-                    canvas.classList.remove('active');
-                    matrixActive = false;
-                    clearInterval(matrixAnimation);
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    showNotification('🖥️ Matrix模式已关闭');
+                    starfield.classList.remove('active');
+                    starfieldActive = false;
+                    clearInterval(shootingStarInterval);
+                    starfield.innerHTML = '';
+                    showNotification('✨ 星空模式已关闭');
                 }
             });
         }
@@ -2949,7 +3599,7 @@
         // ========== 浮动提示 ==========
         function showFloatingTip() {
             const tips = [
-                '💡 双击页面可开启Matrix模式',
+                '💡 双击页面可开启星空模式',
                 '🎮 试试点击挑战小游戏',
                 '🌈 连续点击头像5次有惊喜',
                 '⌨️ 输入↑↑↓↓←→←→BA试试',
@@ -3010,7 +3660,7 @@
 
                 // 按 H 显示帮助
                 if (e.key === 'h' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                    showNotification('快捷键: C=彩带 | H=帮助 | 双击=Matrix');
+                    showNotification('快捷键: C=彩带 | H=帮助 | 双击=星空');
                 }
             });
         }
@@ -3055,6 +3705,245 @@
                 showNotification('🎉 欢迎首次访问！探索页面发现更多彩蛋~');
                 createConfetti(50);
             }, 1500);
+        }
+
+        // ========== AI对话功能 ==========
+        let aiChatOpen = false;
+        let aiMessages = [];
+
+        function toggleAIChat() {
+            const chatWindow = document.getElementById('ai-chat-window');
+            aiChatOpen = !aiChatOpen;
+
+            if (aiChatOpen) {
+                chatWindow.classList.add('open');
+                document.getElementById('ai-input').focus();
+            } else {
+                chatWindow.classList.remove('open');
+            }
+        }
+
+        function handleAIInputKeypress(event) {
+            if (event.key === 'Enter') {
+                sendAIMessage();
+            }
+        }
+
+        async function sendAIMessage() {
+            const input = document.getElementById('ai-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesContainer = document.getElementById('ai-chat-messages');
+            const sendBtn = document.getElementById('ai-send-btn');
+
+            // 添加用户消息
+            const userMsgEl = document.createElement('div');
+            userMsgEl.className = 'ai-message user';
+            userMsgEl.textContent = message;
+            messagesContainer.appendChild(userMsgEl);
+
+            // 清空输入框
+            input.value = '';
+            sendBtn.disabled = true;
+
+            // 添加加载动画
+            const typingEl = document.createElement('div');
+            typingEl.className = 'ai-message assistant typing';
+            typingEl.innerHTML = '<span></span><span></span><span></span>';
+            messagesContainer.appendChild(typingEl);
+
+            // 滚动到底部
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // 添加到消息历史
+            aiMessages.push({ role: 'user', content: message });
+
+            try {
+                // 获取API配置
+                const apiUrl = currentConfig.apiUrl || defaultConfig.apiUrl;
+                const apiKey = currentConfig.apiKey || defaultConfig.apiKey;
+                const modelName = currentConfig.aiModelName || defaultConfig.aiModelName;
+                const aiProvider = currentConfig.aiProvider || defaultConfig.aiProvider;
+
+                // 构建基础请求体
+                const requestBody = {
+                    model: modelName,
+                    messages: [
+                        { role: 'system', content: '你是一个友好的AI助手，回答要简洁明了。' },
+                        ...aiMessages
+                    ],
+                    max_tokens: 1000
+                };
+
+                // 根据不同AI提供商添加特定参数
+                if (aiProvider === 'deepseek') {
+                    // DeepSeek 支持 OpenAI 兼容参数
+                    requestBody.temperature = 0.7;
+                } else if (aiProvider === 'claude') {
+                    // Claude API 只使用基础参数，不添加额外参数
+                    requestBody.temperature = 0.7;
+                }
+
+                const response = await fetch(`${apiUrl}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                // 移除加载动画
+                typingEl.remove();
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    const errorEl = document.createElement('div');
+                    errorEl.className = 'ai-message assistant';
+                    errorEl.textContent = '❌ API错误: ' + (errorData.error?.message || `HTTP ${response.status}`);
+                    messagesContainer.appendChild(errorEl);
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.choices && data.choices[0]) {
+                    const assistantMessage = data.choices[0].message.content;
+                    aiMessages.push({ role: 'assistant', content: assistantMessage });
+
+                    // 添加AI回复
+                    const aiMsgEl = document.createElement('div');
+                    aiMsgEl.className = 'ai-message assistant';
+                    aiMsgEl.textContent = assistantMessage;
+                    messagesContainer.appendChild(aiMsgEl);
+                } else if (data.error) {
+                    const errorEl = document.createElement('div');
+                    errorEl.className = 'ai-message assistant';
+                    const errorMsg = typeof data.error === 'string' ? data.error : (data.error.message || JSON.stringify(data.error));
+                    errorEl.textContent = '❌ 错误: ' + errorMsg;
+                    messagesContainer.appendChild(errorEl);
+                } else {
+                    const errorEl = document.createElement('div');
+                    errorEl.className = 'ai-message assistant';
+                    errorEl.textContent = '❌ 未知错误: 无法解析响应';
+                    messagesContainer.appendChild(errorEl);
+                }
+            } catch (error) {
+                typingEl.remove();
+                const errorEl = document.createElement('div');
+                errorEl.className = 'ai-message assistant';
+                errorEl.textContent = '❌ 网络错误: ' + (error.message || '请稍后重试');
+                messagesContainer.appendChild(errorEl);
+                console.error('AI Error:', error);
+            }
+
+            sendBtn.disabled = false;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 修改saveSettings函数
+        const originalSaveSettings = saveSettings;
+        saveSettings = function() {
+            // 调用原始保存函数的逻辑
+            currentConfig.name = document.getElementById('setting-name').value || 'YJX';
+            currentConfig.bio = document.getElementById('setting-bio').value || '一个热爱编程的开发者';
+            currentConfig.status = document.getElementById('setting-status').value || '可以联系';
+            currentConfig.phone = document.getElementById('setting-phone').value || '18325666364';
+            currentConfig.email = document.getElementById('setting-email').value || 'example@qq.com';
+            currentConfig.github = document.getElementById('setting-github').value || 'https://github.com';
+            currentConfig.wechat = document.getElementById('setting-wechat').value || '微信号';
+            currentConfig.qq = document.getElementById('setting-qq').value || 'QQ号';
+            currentConfig.bilibili = document.getElementById('setting-bilibili').value || 'B站';
+            currentConfig.birthday = document.getElementById('setting-birthday').value || '2000-01-01';
+
+            const skillInputs = document.querySelectorAll('[data-skill-index]');
+            currentConfig.skills = Array.from(skillInputs).map(input => input.value).filter(v => v.trim());
+
+            saveConfig(currentConfig);
+            applyConfig();
+            updateCountdowns();
+            toggleSettings();
+            showNotification('✅ 设置已保存！');
+        };
+
+        // ========== AI设置面板功能 ==========
+        let aiPanelUnlocked = false;
+
+        function openAISettings() {
+            document.getElementById('ai-settings-overlay').classList.add('open');
+            document.getElementById('ai-settings-panel').classList.add('open');
+        }
+
+        function closeAISettings() {
+            document.getElementById('ai-settings-overlay').classList.remove('open');
+            document.getElementById('ai-settings-panel').classList.remove('open');
+        }
+
+        function unlockAIPanel() {
+            const password = prompt('请输入密码：');
+            if (password === '888888') {
+                aiPanelUnlocked = true;
+                document.getElementById('ai-panel-locked').style.display = 'none';
+                document.getElementById('ai-panel-unlocked').style.display = 'block';
+
+                // 加载当前配置
+                document.getElementById('ai-setting-model').value = currentConfig.aiProvider || 'deepseek';
+                document.getElementById('ai-setting-url').value = currentConfig.apiUrl || defaultConfig.apiUrl;
+                document.getElementById('ai-setting-key').value = currentConfig.apiKey || defaultConfig.apiKey;
+                document.getElementById('ai-setting-model-name').value = currentConfig.aiModelName || defaultConfig.aiModelName;
+
+                showNotification('✅ AI配置已解锁');
+            } else if (password !== null) {
+                showNotification('❌ 密码错误');
+            }
+        }
+
+        function onAIModelChange() {
+            const provider = document.getElementById('ai-setting-model').value;
+            const preset = aiProviderPresets[provider];
+            if (preset && provider !== 'custom') {
+                document.getElementById('ai-setting-url').value = preset.url;
+                document.getElementById('ai-setting-model-name').value = preset.model;
+            }
+        }
+
+        function toggleAIKeyVisibility() {
+            const input = document.getElementById('ai-setting-key');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function saveAISettings() {
+            const aiProvider = document.getElementById('ai-setting-model').value;
+            const apiUrl = document.getElementById('ai-setting-url').value.trim();
+            const apiKey = document.getElementById('ai-setting-key').value.trim();
+            const aiModelName = document.getElementById('ai-setting-model-name').value.trim();
+
+            currentConfig.aiProvider = aiProvider;
+            if (apiUrl) currentConfig.apiUrl = apiUrl;
+            if (apiKey) currentConfig.apiKey = apiKey;
+            if (aiModelName) currentConfig.aiModelName = aiModelName;
+
+            saveConfig(currentConfig);
+            closeAISettings();
+            showNotification('✅ AI配置已保存！');
+        }
+
+        function resetAISettings() {
+            if (confirm('确定要恢复默认API配置吗？')) {
+                currentConfig.aiProvider = defaultConfig.aiProvider;
+                currentConfig.apiUrl = defaultConfig.apiUrl;
+                currentConfig.apiKey = defaultConfig.apiKey;
+                currentConfig.aiModelName = defaultConfig.aiModelName;
+                saveConfig(currentConfig);
+
+                document.getElementById('ai-setting-model').value = defaultConfig.aiProvider;
+                document.getElementById('ai-setting-url').value = defaultConfig.apiUrl;
+                document.getElementById('ai-setting-key').value = defaultConfig.apiKey;
+                document.getElementById('ai-setting-model-name').value = defaultConfig.aiModelName;
+
+                showNotification('✅ 已恢复默认API配置');
+            }
         }
     </script>
 </body>
