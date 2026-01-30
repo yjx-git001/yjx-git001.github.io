@@ -3,6 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://wttr.in">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的个人主页</title>
     <style>
@@ -1915,42 +1916,7 @@
             }
         }
 
-        /* 浮动提示气泡 */
-        .floating-tip {
-            position: fixed;
-            bottom: 100px;
-            left: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            animation: floatTip 3s ease-in-out infinite;
-            cursor: pointer;
-            z-index: 1000;
-            max-width: 200px;
-        }
 
-        .floating-tip::after {
-            content: '×';
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 20px;
-            height: 20px;
-            background: #f5576c;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        @keyframes floatTip {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
 
         /* 页面切换动画 */
         .page-transition {
@@ -2690,8 +2656,34 @@
         let currentWeatherData = null;
 
         function initWeather() {
-            // 始终尝试获取当前位置
+            // 检查缓存
+            if (checkWeatherCache()) {
+                console.log('使用缓存的天气数据');
+                return;
+            }
+            // 获取位置
             getLocation();
+        }
+
+        function checkWeatherCache() {
+            const cache = localStorage.getItem('weatherCache');
+            if (!cache) return false;
+
+            try {
+                const { timestamp, data, cityName, configCity } = JSON.parse(cache);
+                // 缓存有效期 30 分钟
+                if (Date.now() - timestamp < 30 * 60 * 1000) {
+                    // 如果配置的城市改变了，缓存失效
+                    if ((currentConfig.city || '') !== (configCity || '')) {
+                        return false;
+                    }
+                    processWeatherData(data, cityName, true);
+                    return true;
+                }
+            } catch (e) {
+                console.error('Cache check error', e);
+            }
+            return false;
         }
 
         function getLocation() {
@@ -2706,7 +2698,32 @@
                 `;
             }
 
+            // 1. 优先使用手动设置的城市 (最快)
+            if (currentConfig.city) {
+                getWeatherByCity(currentConfig.city);
+                return;
+            }
+
+            // 2. 并行获取策略 (Race + Upgrade)
+            // 立即启动IP定位 (速度快)
+            let ipFetchDone = false;
+            
+            // 封装IP获取
+            const ipPromise = new Promise(async (resolve) => {
+                try {
+                    await getWeatherByIP(false); // false = 暂不报错
+                    ipFetchDone = true;
+                    resolve(true);
+                } catch(e) {
+                    resolve(false);
+                }
+            });
+
+            // 尝试使用 Geolocation (精度高)
             if (navigator.geolocation) {
+                // 如果IP获取很快完成，用户先看到IP结果
+                // 如果Geolocation随后完成，会更新为更精确的结果
+                
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const lat = position.coords.latitude;
@@ -2714,33 +2731,62 @@
                         currentConfig.latitude = lat;
                         currentConfig.longitude = lon;
                         saveConfig(currentConfig);
-                        getWeatherByCoords(lat, lon);
+                        
+                        // 获取精确天气
+                        getWeatherByCoords(lat, lon).then(() => {
+                            // 如果之前显示的是IP定位的结果，这里会无缝更新为精确结果
+                            showNotification('📍 已更新为精确位置');
+                        });
                     },
                     (error) => {
                         console.log('获取位置失败:', error);
-                        // 使用IP定位作为备用方案
-                        getWeatherByIP();
+                        // 如果Geolocation失败，确保IP获取已执行
+                        if (!ipFetchDone) {
+                            // 如果IP还没完成，它会自动完成
+                            // 如果IP已经完成，什么都不用做
+                        }
                     },
                     {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 300000
+                        enableHighAccuracy: false, // 速度优先
+                        timeout: 4000, // 4秒超时
+                        maximumAge: 600000 // 10分钟缓存
                     }
                 );
-            } else {
-                getWeatherByIP();
+            }
+            
+            // 始终执行IP获取作为保底和快速展示
+            // 注意：这里不需要 await，让它在后台跑
+            getWeatherByIP(true);
+        }
+
+        // 通过城市名获取天气
+        async function getWeatherByCity(city) {
+            try {
+                const response = await fetch(`https://wttr.in/${encodeURIComponent(city)}?format=j1&lang=zh`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                processWeatherData(data, city);
+            } catch (error) {
+                console.error('获取城市天气失败:', error);
+                showWeatherError();
             }
         }
 
         // 通过IP获取天气（备用方案）
-        async function getWeatherByIP() {
+        // silenceError: 是否静默失败（不显示错误UI），用于Race模式
+        async function getWeatherByIP(showError = true) {
             try {
                 const response = await fetch('https://wttr.in/?format=j1&lang=zh');
                 const data = await response.json();
+                
+                // 如果此时已经有更精确的数据（比如Geolocation刚好先完成了），则不渲染
+                // 这里可以通过检查 currentConfig.latitude 来判断是否刚刚更新了精确位置？
+                // 简化起见，直接渲染，Geolocation回来后会覆盖
                 processWeatherData(data);
             } catch (error) {
                 console.error('IP定位天气获取失败:', error);
-                showWeatherError();
+                if (showError) showWeatherError();
+                throw error;
             }
         }
 
@@ -2756,14 +2802,16 @@
             }
         }
 
-        function processWeatherData(data, cityName) {
+        function processWeatherData(data, cityName, fromCache = false) {
             try {
                 const current = data.current_condition[0];
                 const forecast = data.weather;
                 const area = data.nearest_area ? data.nearest_area[0] : null;
+                
+                const resolvedCityName = cityName || (area ? area.areaName[0].value : '未知');
 
                 currentWeatherData = {
-                    city: cityName || (area ? area.areaName[0].value : '未知'),
+                    city: resolvedCityName,
                     temp: current.temp_C,
                     feelsLike: current.FeelsLikeC,
                     humidity: current.humidity,
@@ -2778,6 +2826,15 @@
                         desc: day.hourly[4].lang_zh && day.hourly[4].lang_zh[0] ? day.hourly[4].lang_zh[0].value : day.hourly[4].weatherDesc[0].value
                     }))
                 };
+
+                if (!fromCache) {
+                    localStorage.setItem('weatherCache', JSON.stringify({
+                        timestamp: Date.now(),
+                        data: data,
+                        cityName: resolvedCityName,
+                        configCity: currentConfig.city || ''
+                    }));
+                }
 
                 renderWeather();
                 updateWeatherReminder();
@@ -2945,6 +3002,9 @@
         }
 
         function refreshWeather() {
+            // 清除缓存
+            localStorage.removeItem('weatherCache');
+
             const mainEl = document.getElementById('weather-main');
             mainEl.innerHTML = `
                 <div class="weather-loading">
@@ -3809,44 +3869,6 @@
             }
         }
 
-        // ========== 浮动提示 ==========
-        function showFloatingTip() {
-            const tips = [
-                '💡 双击页面可开启星空模式',
-                '🎮 试试点击挑战小游戏',
-                '⌨️ 输入↑↑↓↓←→←→BA试试',
-                '🔥 每天来访可累积连续天数',
-                '🎨 点击简介可重播打字效果'
-            ];
-
-            // 检查是否已显示过
-            const lastTipTime = localStorage.getItem('lastTipTime');
-            const now = Date.now();
-            if (lastTipTime && now - parseInt(lastTipTime) < 3600000) return;
-
-            const tip = document.createElement('div');
-            tip.className = 'floating-tip';
-            tip.textContent = tips[Math.floor(Math.random() * tips.length)];
-            tip.onclick = () => {
-                tip.style.animation = 'floatTip 0.3s ease-out reverse';
-                setTimeout(() => {
-                    if (tip.parentNode) tip.parentNode.removeChild(tip);
-                }, 300);
-                localStorage.setItem('lastTipTime', now.toString());
-            };
-
-            document.body.appendChild(tip);
-
-            setTimeout(() => {
-                if (tip.parentNode) {
-                    tip.style.animation = 'floatTip 0.3s ease-out reverse';
-                    setTimeout(() => {
-                        if (tip.parentNode) tip.parentNode.removeChild(tip);
-                    }, 300);
-                }
-            }, 10000);
-        }
-
         // ========== 页面加载动画 ==========
         function showPageTransition() {
             const transition = document.createElement('div');
@@ -3906,7 +3928,6 @@
             setTimeout(() => {
                 initKeyboardShortcuts();
                 initVisibilityChange();
-                setTimeout(showFloatingTip, 3000);
             }, 500);
         });
 
@@ -4074,6 +4095,10 @@
 
             saveConfig(currentConfig);
             applyConfig();
+            
+            // 刷新天气 (可能会根据新位置更新，虽然不能手动设置城市了，但为了保持逻辑一致性)
+            initWeather();
+            
             updateCountdowns();
             toggleSettings();
             showNotification('✅ 设置已保存！');
