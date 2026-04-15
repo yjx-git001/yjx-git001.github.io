@@ -1,4189 +1,1264 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <link rel="preconnect" href="https://wttr.in">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人主页</title>
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg-gradient-light: radial-gradient(circle at top left, #f3f4f6 0%, #e5e7eb 100%);
-            --bg-gradient-dark: radial-gradient(circle at top left, #0f172a 0%, #1e1b4b 100%);
-            --card-bg-light: rgba(255, 255, 255, 0.7);
-            --card-bg-dark: rgba(30, 41, 59, 0.6);
-            --text-light: #1e293b;
-            --text-dark: #f8fafc;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            background: var(--bg-gradient-light);
-            color: var(--text-light);
-            padding: 40px 20px;
-            position: relative;
-            overflow-x: hidden;
-            transition: all 0.5s ease;
-        }
-
-        body.dark-mode {
-            background: var(--bg-gradient-dark);
-            color: var(--text-dark);
-        }
-
-        /* Ambient Background Mesh */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08) 0%, transparent 25%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 32px;
-            align-items: start;
-        }
-
-        @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
-                max-width: 800px;
-            }
-        }
-
-        /* 主题切换按钮 */
-        .theme-toggle {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .theme-toggle:hover {
-            transform: rotate(180deg);
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-
-        /* 个人信息卡片 (侧边栏) */
-        .profile-card {
-            background: var(--card-bg-light);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 32px;
-            padding: 48px 32px;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 40px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .profile-card {
-            background: var(--card-bg-dark);
-            border-color: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-            animation: float 3s ease-in-out infinite;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .avatar-emoji {
-            font-size: 60px;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        h1 {
-            color: #2d3748;
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        body.dark-mode h1 {
-            color: #e2e8f0;
-        }
-
-        .bio {
-            color: #718096;
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        body.dark-mode .bio {
-            color: #a0aec0;
-        }
-
-        /* 状态标签 */
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(72, 187, 120, 0.2);
-            color: #38a169;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .status::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: #38a169;
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* 社交链接 */
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .social-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .social-link:hover .social-icon {
-            transform: translateY(-4px);
-            background: rgba(102, 126, 234, 0.4);
-        }
-
-        .social-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(102, 126, 234, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .social-label {
-            font-size: 12px;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        body.dark-mode .social-label {
-            color: #a5b4fc;
-        }
-
-        /* 功能卡片网格 */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
-            align-content: start;
-        }
-
-        /* 通用卡片样式 */
-        .card {
-            background: var(--card-bg-light);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: fadeInUp 0.6s ease-out both;
-            display: flex;
-            flex-direction: column;
-        }
-
-        body.dark-mode .card {
-            background: var(--card-bg-dark);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-dark);
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2);
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
-
-        body.dark-mode .card:hover {
-            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.15s; }
-        .card:nth-child(3) { animation-delay: 0.2s; }
-        .card:nth-child(4) { animation-delay: 0.25s; }
-        .card:nth-child(5) { animation-delay: 0.3s; }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-light);
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: -0.01em;
-        }
-
-        body.dark-mode .card-title {
-            color: var(--text-dark);
-        }
-
-        /* 下班倒计时卡片 (静态版) */
-        .work-countdown-card-static {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            color: white;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            border: none;
-            grid-column: span 1;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
-        }
-
-        .work-countdown-card-static::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
-            animation: rotate 15s linear infinite;
-        }
-
-        .work-countdown-card-static .countdown-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 2;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-        }
-
-        .work-countdown-card-static .countdown-title {
-            color: rgba(255, 255, 255, 1);
-            margin-bottom: 24px;
-            font-size: 20px;
-            font-weight: 800;
-            position: relative;
-            z-index: 2;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .work-countdown-card-static .countdown-time {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 24px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .work-countdown-card-static .time-block {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 12px 10px;
-            min-width: 70px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .work-countdown-card-static .time-value {
-            font-family: 'Monaco', 'Courier New', monospace;
-            font-size: 28px;
-            font-weight: 800;
-            line-height: 1.2;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .work-countdown-card-static .time-label {
-            font-size: 11px;
-            opacity: 0.9;
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
-        .work-countdown-card-static .time-separator {
-            font-size: 24px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: -16px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .work-countdown-card-static .countdown-status {
-            position: relative;
-            z-index: 2;
-            font-size: 14px;
-            font-weight: 500;
-            background: rgba(255, 255, 255, 0.15);
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .card-title::before {
-            font-size: 24px;
-        }
-
-        /* 联系方式 */
-        .contact-links {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .contact-link {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .contact-link.revealed {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        }
-
-        .contact-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .contact-link:hover::before {
-            left: 100%;
-        }
-
-        .contact-link:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
-        }
-
-        .contact-link:active {
-            transform: translateY(-2px);
-        }
-
-        .icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            margin-right: 12px;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .contact-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            flex: 1;
-        }
-
-        .contact-label {
-            font-size: 13px;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        .contact-value {
-            font-size: 14px;
-            opacity: 0.8;
-            font-weight: 400;
-        }
-
-        .contact-value.hidden {
-            user-select: none;
-        }
-
-        .contact-link.revealed .contact-value {
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .contact-tip {
-            text-align: center;
-            font-size: 12px;
-            color: #718096;
-            margin-top: 12px;
-            padding: 8px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 8px;
-        }
-
-        body.dark-mode .contact-tip {
-            color: #a0aec0;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 0.8;
-                transform: scale(1);
-            }
-        }
-
-        /* 技能标签 */
-        .skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .skill-tag {
-            padding: 6px 12px;
-            background: rgba(102, 126, 234, 0.15);
-            color: #667eea;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        body.dark-mode .skill-tag {
-            background: rgba(102, 126, 234, 0.3);
-            color: #a5b4fc;
-        }
-
-        .skill-tag:hover {
-            background: rgba(102, 126, 234, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* 访客计数器 */
-        .visitor-counter {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: rgba(102, 126, 234, 0.15);
-            border-radius: 12px;
-            font-size: 14px;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        body.dark-mode .visitor-counter {
-            background: rgba(102, 126, 234, 0.3);
-            color: #a5b4fc;
-        }
-
-        .visitor-counter .count {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        /* 天气卡片样式 */
-        .weather-refresh-btn {
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            margin-left: auto;
-            padding: 4px;
-            opacity: 0.6;
-            transition: all 0.3s ease;
-        }
-
-        .weather-refresh-btn:hover {
-            opacity: 1;
-            transform: rotate(180deg);
-        }
-
-        .weather-loading {
-            text-align: center;
-            padding: 30px 20px;
-            color: #718096;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(102, 126, 234, 0.2);
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 12px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .weather-main {
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-
-        .weather-current {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .weather-icon-large {
-            font-size: 64px;
-            line-height: 1;
-        }
-
-        .weather-info {
-            flex: 1;
-        }
-
-        .weather-city {
-            font-size: 18px;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        body.dark-mode .weather-city {
-            color: #e2e8f0;
-        }
-
-        .weather-temp {
-            font-size: 36px;
-            font-weight: 700;
-            color: #667eea;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-
-        .weather-desc {
-            font-size: 14px;
-            color: #718096;
-        }
-
-        body.dark-mode .weather-desc {
-            color: #a0aec0;
-        }
-
-        .weather-details {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(102, 126, 234, 0.2);
-        }
-
-        .weather-detail-item {
-            text-align: center;
-        }
-
-        .weather-detail-label {
-            font-size: 12px;
-            color: #718096;
-            margin-bottom: 4px;
-        }
-
-        body.dark-mode .weather-detail-label {
-            color: #a0aec0;
-        }
-
-        .weather-detail-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        body.dark-mode .weather-detail-value {
-            color: #e2e8f0;
-        }
-
-        .weather-forecast {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .forecast-item {
-            text-align: center;
-            padding: 12px 8px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .forecast-item:hover {
-            background: rgba(102, 126, 234, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .forecast-date {
-            font-size: 12px;
-            color: #718096;
-            margin-bottom: 8px;
-        }
-
-        body.dark-mode .forecast-date {
-            color: #a0aec0;
-        }
-
-        .forecast-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .forecast-temp {
-            font-size: 14px;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        body.dark-mode .forecast-temp {
-            color: #e2e8f0;
-        }
-
-        .weather-tip {
-            text-align: center;
-            font-size: 12px;
-            color: #718096;
-            padding: 8px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 8px;
-        }
-
-        body.dark-mode .weather-tip {
-            color: #a0aec0;
-        }
-
-        .weather-alert {
-            padding: 12px;
-            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
-            color: white;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .weather-alert.rain {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-        }
-
-        .weather-alert.hot {
-            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
-        }
-
-        .weather-alert.cold {
-            background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
-        }
-
-        /* 每日一言 */
-        .quote-container {
-            padding: 20px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 12px;
-            margin-bottom: 16px;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .quote-text {
-            font-size: 16px;
-            line-height: 1.8;
-            color: #2d3748;
-            margin-bottom: 12px;
-            font-style: italic;
-        }
-
-        body.dark-mode .quote-text {
-            color: #e2e8f0;
-        }
-
-        .quote-author {
-            font-size: 14px;
-            color: #718096;
-            text-align: right;
-        }
-
-        body.dark-mode .quote-author {
-            color: #a0aec0;
-        }
-
-        .refresh-btn {
-            width: 100%;
-            padding: 10px;
-            background: rgba(102, 126, 234, 0.2);
-            border: none;
-            border-radius: 8px;
-            color: #667eea;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 16px;
-        }
-
-        .refresh-btn:hover {
-            background: rgba(102, 126, 234, 0.3);
-            transform: translateY(-2px);
-        }
-
-        body.dark-mode .refresh-btn {
-            color: #a5b4fc;
-        }
-
-        /* 倒计时 */
-        .countdown-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .countdown-item {
-            padding: 16px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .countdown-label {
-            font-size: 14px;
-            color: #718096;
-            margin-bottom: 8px;
-        }
-
-        body.dark-mode .countdown-label {
-            color: #a0aec0;
-        }
-
-        .countdown-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        body.dark-mode .countdown-value {
-            color: #a5b4fc;
-        }
-
-        /* 时间显示 */
-        .time-display {
-            text-align: center;
-            color: #718096;
-            font-size: 14px;
-            margin-top: 12px;
-        }
-
-        body.dark-mode .time-display {
-            color: #a0aec0;
-        }
-
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .avatar {
-                width: 100px;
-                height: 100px;
-                font-size: 50px;
-            }
-
-            h1 {
-                font-size: 28px;
-            }
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 24px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-        }
-
-        /* 设置按钮 */
-        .settings-btn {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .settings-btn:hover {
-            transform: rotate(90deg) scale(1.1);
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* 设置面板 */
-        .settings-panel {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 100%;
-            max-width: 500px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
-            transition: right 0.3s ease;
-            z-index: 2000;
-            overflow-y: auto;
-            padding: 24px;
-        }
-
-        body.dark-mode .settings-panel {
-            background: rgba(45, 55, 72, 0.98);
-        }
-
-        .settings-panel.open {
-            right: 0;
-        }
-
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-        }
-
-        .settings-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #2d3748;
-        }
-
-        body.dark-mode .settings-title {
-            color: #e2e8f0;
-        }
-
-        .close-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(102, 126, 234, 0.2);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .close-btn:hover {
-            background: rgba(102, 126, 234, 0.4);
-            transform: rotate(90deg);
-        }
-
-        .settings-section {
-            margin-bottom: 24px;
-        }
-
-        .settings-section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #667eea;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .settings-input,
-        .settings-textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid rgba(102, 126, 234, 0.2);
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            background: rgba(255, 255, 255, 0.5);
-            color: #2d3748;
-            transition: all 0.3s ease;
-            margin-bottom: 8px;
-        }
-
-        body.dark-mode .settings-input,
-        body.dark-mode .settings-textarea {
-            background: rgba(45, 55, 72, 0.5);
-            color: #e2e8f0;
-            border-color: rgba(102, 126, 234, 0.3);
-        }
-
-        .settings-input:focus,
-        .settings-textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        body.dark-mode .settings-input:focus,
-        body.dark-mode .settings-textarea:focus {
-            background: rgba(45, 55, 72, 0.8);
-        }
-
-        .settings-textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .settings-label {
-            display: block;
-            font-size: 13px;
-            color: #718096;
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        body.dark-mode .settings-label {
-            color: #a0aec0;
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 12px;
-        }
-
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
-        }
-
-        .reset-btn {
-            width: 100%;
-            padding: 14px;
-            background: rgba(239, 68, 68, 0.2);
-            color: #dc2626;
-            border: 2px solid #dc2626;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 8px;
-        }
-
-        .reset-btn:hover {
-            background: rgba(239, 68, 68, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .skill-input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .skill-input-group input {
-            flex: 1;
-        }
-
-        .add-skill-btn,
-        .remove-skill-btn {
-            padding: 12px 16px;
-            background: rgba(102, 126, 234, 0.2);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .add-skill-btn:hover {
-            background: rgba(102, 126, 234, 0.4);
-        }
-
-        .remove-skill-btn {
-            background: rgba(239, 68, 68, 0.2);
-            color: #dc2626;
-        }
-
-        .remove-skill-btn:hover {
-            background: rgba(239, 68, 68, 0.4);
-        }
-
-        .settings-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 1999;
-        }
-
-        .settings-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* 头像上传 */
-        .avatar-upload {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .avatar-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .avatar-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .upload-btn {
-            padding: 10px 20px;
-            background: rgba(102, 126, 234, 0.2);
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: #667eea;
-            transition: all 0.3s ease;
-        }
-
-        .upload-btn:hover {
-            background: rgba(102, 126, 234, 0.4);
-        }
-
-        /* 鼠标跟随粒子 */
-        .particle {
-            position: fixed;
-            pointer-events: none;
-            border-radius: 50%;
-            z-index: 9999;
-            animation: particleFade 1s ease-out forwards;
-        }
-
-        @keyframes particleFade {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0);
-            }
-        }
-
-        /* 3D卡片效果 */
-        .card-3d {
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-
-        .card-3d:hover {
-            z-index: 10;
-        }
-
-        /* 打字机光标 */
-        .typing-cursor {
-            display: inline-block;
-            width: 3px;
-            height: 1em;
-            background: #667eea;
-            margin-left: 2px;
-            animation: blink 0.8s infinite;
-            vertical-align: text-bottom;
-        }
-
-        body.dark-mode .typing-cursor {
-            background: #a5b4fc;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        /* 烟花效果容器 */
-        .firework {
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-        }
-
-        .firework-particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            animation: fireworkExplode 1s ease-out forwards;
-        }
-
-        @keyframes fireworkExplode {
-            0% {
-                opacity: 1;
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(var(--tx), var(--ty)) scale(0);
-            }
-        }
-
-        /* 技能标签悬浮动画 */
-        .skill-tag {
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .skill-tag::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .skill-tag:active::after {
-            width: 200px;
-            height: 200px;
-        }
-
-        /* 音乐可视化效果 */
-        .music-visualizer {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 3px;
-            height: 30px;
-            margin-top: 12px;
-        }
-
-        .music-bar {
-            width: 4px;
-            background: linear-gradient(to top, #667eea, #764ba2);
-            border-radius: 2px;
-            animation: musicBounce 0.5s ease-in-out infinite alternate;
-        }
-
-        .music-bar:nth-child(1) { animation-delay: 0s; height: 10px; }
-        .music-bar:nth-child(2) { animation-delay: 0.1s; height: 20px; }
-        .music-bar:nth-child(3) { animation-delay: 0.2s; height: 15px; }
-        .music-bar:nth-child(4) { animation-delay: 0.3s; height: 25px; }
-        .music-bar:nth-child(5) { animation-delay: 0.4s; height: 18px; }
-        .music-bar:nth-child(6) { animation-delay: 0.5s; height: 22px; }
-        .music-bar:nth-child(7) { animation-delay: 0.6s; height: 12px; }
-
-        @keyframes musicBounce {
-            0% { transform: scaleY(0.3); }
-            100% { transform: scaleY(1); }
-        }
-
-        /* 滚动进度条 */
-        .scroll-progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
-            z-index: 9999;
-            transition: width 0.1s;
-        }
-
-        /* 返回顶部按钮 */
-        .back-to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .back-to-top.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .back-to-top:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-        }
-
-        /* 天气小组件 */
-        .weather-widget {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 16px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 12px;
-            margin-top: 16px;
-        }
-
-        .weather-icon {
-            font-size: 32px;
-            animation: weatherFloat 2s ease-in-out infinite;
-        }
-
-        @keyframes weatherFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .weather-info {
-            text-align: left;
-        }
-
-        .weather-temp {
-            font-size: 24px;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        body.dark-mode .weather-temp {
-            color: #a5b4fc;
-        }
-
-        .weather-desc {
-            font-size: 12px;
-            color: #718096;
-        }
-
-        body.dark-mode .weather-desc {
-            color: #a0aec0;
-        }
-
-        /* 问候语 */
-        .greeting {
-            font-size: 18px;
-            color: #667eea;
-            margin-bottom: 8px;
-            animation: fadeIn 1s ease-out;
-        }
-
-        body.dark-mode .greeting {
-            color: #a5b4fc;
-        }
-
-        /* 连续访问徽章 */
-        .streak-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 6px 14px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            animation: pulse 2s ease-in-out infinite;
-            cursor: pointer;
-        }
-
-        .streak-badge:hover {
-            transform: scale(1.05);
-        }
-
-        /* 点击游戏 */
-        .click-game {
-            padding: 16px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 16px;
-        }
-
-        .click-game-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            cursor: pointer;
-            font-size: 32px;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            transition: all 0.1s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .click-game-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
-        }
-
-        .click-game-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
-        }
-
-        .click-game-btn:active::after {
-            width: 100px;
-            height: 100px;
-        }
-
-        .click-score {
-            margin-top: 12px;
-            font-size: 14px;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        body.dark-mode .click-score {
-            color: #a5b4fc;
-        }
-
-        .click-timer {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 4px;
-        }
-
-        body.dark-mode .click-timer {
-            color: #a0aec0;
-        }
-
-        /* 星空背景 */
-        .starfield {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9997;
-            opacity: 0;
-            transition: opacity 0.5s;
-            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-        }
-
-        .starfield.active {
-            opacity: 1;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 2s ease-in-out infinite;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        .shooting-star {
-            position: absolute;
-            width: 100px;
-            height: 2px;
-            background: linear-gradient(90deg, white, transparent);
-            animation: shoot 1s ease-out forwards;
-        }
-
-        @keyframes shoot {
-            0% {
-                transform: translateX(0) translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateX(300px) translateY(300px);
-                opacity: 0;
-            }
-        }
-
-        /* AI聊天窗口 */
-        .ai-chat-btn {
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 28px;
-            color: white;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        .ai-chat-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
-        }
-
-        .ai-chat-window {
-            position: fixed;
-            bottom: 180px;
-            right: 30px;
-            width: 380px;
-            max-width: calc(100vw - 60px);
-            height: 500px;
-            max-height: calc(100vh - 220px);
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            z-index: 1001;
-            overflow: hidden;
-            /* 初始隐藏状态 */
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.dark-mode .ai-chat-window {
-            background: rgba(45, 55, 72, 0.98);
-        }
-
-        .ai-chat-window.open {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .ai-chat-header {
-            padding: 16px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .ai-chat-header h3 {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .ai-chat-close {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            color: white;
-            transition: all 0.2s;
-        }
-
-        .ai-chat-close:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .ai-chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .ai-message {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 16px;
-            font-size: 14px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        .ai-message.user {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-message.assistant {
-            align-self: flex-start;
-            background: rgba(102, 126, 234, 0.1);
-            color: #2d3748;
-            border-bottom-left-radius: 4px;
-        }
-
-        body.dark-mode .ai-message.assistant {
-            background: rgba(102, 126, 234, 0.2);
-            color: #e2e8f0;
-        }
-
-        .ai-message.typing {
-            display: flex;
-            gap: 4px;
-            padding: 16px;
-        }
-
-        .ai-message.typing span {
-            width: 8px;
-            height: 8px;
-            background: #667eea;
-            border-radius: 50%;
-            animation: typing 1s ease-in-out infinite;
-        }
-
-        .ai-message.typing span:nth-child(2) { animation-delay: 0.2s; }
-        .ai-message.typing span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 100% { opacity: 0.3; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1); }
-        }
-
-        .ai-chat-input {
-            padding: 16px;
-            border-top: 1px solid rgba(102, 126, 234, 0.1);
-            display: flex;
-            gap: 10px;
-        }
-
-        .ai-chat-input input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid rgba(102, 126, 234, 0.2);
-            border-radius: 24px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .ai-chat-input input:focus {
-            border-color: #667eea;
-        }
-
-        body.dark-mode .ai-chat-input input {
-            background: rgba(45, 55, 72, 0.5);
-            color: #e2e8f0;
-            border-color: rgba(102, 126, 234, 0.3);
-        }
-
-        .ai-chat-input button {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            color: white;
-            transition: transform 0.2s;
-        }
-
-        .ai-chat-input button:hover {
-            transform: scale(1.05);
-        }
-
-        .ai-chat-input button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* AI设置面板 */
-        .ai-settings-panel {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            width: 90%;
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            z-index: 2001;
-            padding: 24px;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .ai-settings-panel.open {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-        }
-
-        body.dark-mode .ai-settings-panel {
-            background: rgba(45, 55, 72, 0.98);
-        }
-
-        /* 成就徽章 */
-        .achievement {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            padding: 30px 50px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            z-index: 10000;
-            animation: achievementPop 0.5s ease-out forwards;
-        }
-
-        @keyframes achievementPop {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .achievement-icon {
-            font-size: 60px;
-            margin-bottom: 10px;
-        }
-
-        .achievement-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 5px;
-        }
-
-        .achievement-desc {
-            font-size: 14px;
-            color: #718096;
-        }
-
-        /* 彩带/纸屑效果 */
-        .confetti {
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-            animation: confettiFall 3s linear forwards;
-        }
-
-        @keyframes confettiFall {
-            0% {
-                opacity: 1;
-                transform: translateY(0) rotate(0deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(100vh) rotate(720deg);
-            }
-        }
-
-
-
-        /* 页面切换动画 */
-        .page-transition {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 10001;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pageTransition 1s ease-out forwards;
-        }
-
-        @keyframes pageTransition {
-            0% { opacity: 1; }
-            50% { opacity: 1; }
-            100% { opacity: 0; pointer-events: none; }
-        }
-
-        .page-transition .loader {
-            font-size: 48px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* 技能标签进度条 */
-        .skill-tag {
-            position: relative;
-        }
-
-        .skill-tag::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
-            width: 0;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 0 0 8px 8px;
-            transition: width 0.5s ease;
-        }
-
-        .skill-tag:hover::before {
-            width: 100%;
-        }
-
-        /* 社交图标悬浮效果增强 */
-        .social-icon {
-            position: relative;
-        }
-
-        .social-icon::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.4) 0%, transparent 70%);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
-            z-index: -1;
-        }
-
-        .social-link:hover .social-icon::before {
-            width: 80px;
-            height: 80px;
-        }
-
-        
-
-        /* 打字机文字选中效果 */
-        ::selection {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        ::-moz-selection {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .ai-coachmark {
-            position: fixed;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 1002;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: all 0.25s ease;
-        }
-        .ai-coachmark.open {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .ai-coach-bubble {
-            padding: 10px 14px;
-            background: #ffffff;
-            color: #2d3748;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        body.dark-mode .ai-coach-bubble {
-            background: #2d3748;
-            color: #e2e8f0;
-            border-color: #4a5568;
-        }
-        .ai-coach-arrow {
-            width: 18px;
-            height: 18px;
-            border-right: 3px solid #667eea;
-            border-bottom: 3px solid #667eea;
-            transform: rotate(-45deg);
-        }
-        .ai-coach-close {
-            width: 26px;
-            height: 26px;
-            border: none;
-            border-radius: 50%;
-            background: rgba(102,126,234,0.2);
-            color: #667eea;
-            cursor: pointer;
-        }
-        .ai-coach-close:hover {
-            background: rgba(102,126,234,0.3);
-        }
-        .visitor-trend-card canvas {
-            width: 100%;
-            display: block;
-        }
-        .trend-summary {
-            margin-top: 8px;
-            font-size: 12px;
-            color: #718096;
-            text-align: right;
-        }
-        body.dark-mode .trend-summary {
-            color: #a0aec0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex 高级文档站</title>
+  <meta name="description" content="OpenAI Codex 安装、认证、配置、模型切换、VS Code 与 CCSwitch 接入的高级文档展示页。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050816;
+      --bg-soft: #0a1022;
+      --panel: rgba(10, 16, 34, 0.76);
+      --panel-strong: rgba(9, 14, 29, 0.92);
+      --panel-light: rgba(255, 255, 255, 0.04);
+      --card: rgba(255, 255, 255, 0.05);
+      --card-strong: rgba(255, 255, 255, 0.08);
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.14);
+      --text: #f5f7ff;
+      --text-soft: rgba(245, 247, 255, 0.72);
+      --text-faint: rgba(245, 247, 255, 0.48);
+      --primary: #7c88ff;
+      --primary-2: #4fd1ff;
+      --primary-3: #c478ff;
+      --success: #59f1c0;
+      --warning: #ffb86b;
+      --shadow-xl: 0 32px 120px rgba(0, 0, 0, 0.45);
+      --shadow-md: 0 18px 60px rgba(0, 0, 0, 0.28);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+      --container: min(1320px, calc(100% - 48px));
+      --nav-h: 82px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(124, 136, 255, 0.24), transparent 26%),
+        radial-gradient(circle at 88% 10%, rgba(79, 209, 255, 0.18), transparent 20%),
+        radial-gradient(circle at 50% 78%, rgba(196, 120, 255, 0.14), transparent 22%),
+        linear-gradient(180deg, #070b17 0%, #04070f 100%);
+      color: var(--text);
+      font-family: "Geist", "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-feature-settings: "liga" 1;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.55), transparent 84%);
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+
+    code, pre {
+      font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: var(--container);
+      margin: 0 auto;
+      padding-bottom: 64px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(22px);
+      background: rgba(4, 7, 15, 0.62);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .topbar-inner {
+      width: var(--container);
+      margin: 0 auto;
+      min-height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      background:
+        linear-gradient(135deg, rgba(124,136,255,1), rgba(79,209,255,0.95) 60%, rgba(196,120,255,0.95));
+      box-shadow: 0 14px 40px rgba(95, 117, 255, 0.32);
+    }
+
+    .brand-copy {
+      display: grid;
+      gap: 2px;
+    }
+
+    .brand-copy strong {
+      font-size: 15px;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-copy span {
+      color: var(--text-faint);
+      font-size: 12px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--text-soft);
+      font-size: 14px;
+      transition: 0.25s ease;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: var(--text);
+      background: rgba(255,255,255,0.06);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+
+    .hero {
+      position: relative;
+      padding: 56px 0 28px;
+    }
+
+    .hero-panel {
+      position: relative;
+      overflow: hidden;
+      border-radius: 40px;
+      padding: 38px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)),
+        linear-gradient(135deg, rgba(17,25,52,0.92), rgba(8,12,26,0.96));
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow-xl);
+      isolation: isolate;
+    }
+
+    .hero-panel::before,
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(10px);
+      opacity: 0.7;
+      z-index: -1;
+    }
+
+    .hero-panel::before {
+      width: 360px;
+      height: 360px;
+      right: -90px;
+      top: -110px;
+      background: radial-gradient(circle, rgba(124,136,255,0.34), transparent 70%);
+    }
+
+    .hero-panel::after {
+      width: 280px;
+      height: 280px;
+      left: -40px;
+      bottom: -120px;
+      background: radial-gradient(circle, rgba(79,209,255,0.18), transparent 72%);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .eyebrow,
+    .tiny-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      width: fit-content;
+      border-radius: 999px;
+      color: #d7dcff;
+      background: rgba(255,255,255,0.06);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--success), var(--primary-2));
+      box-shadow: 0 0 18px rgba(89, 241, 192, 0.9);
+    }
+
+    .hero-copy {
+      display: grid;
+      align-content: start;
+      gap: 22px;
+      padding-right: 10px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(44px, 6vw, 84px);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+      max-width: 10ch;
+    }
+
+    .hero .lede {
+      margin: 0;
+      max-width: 760px;
+      color: var(--text-soft);
+      font-size: clamp(17px, 2vw, 20px);
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      color: #08101f;
+      background: linear-gradient(135deg, #dfe4ff, #8fe1ff);
+      box-shadow: 0 18px 40px rgba(79, 209, 255, 0.2);
+    }
+
+    .btn-ghost {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      letter-spacing: -0.05em;
+      margin-bottom: 6px;
+    }
+
+    .metric span {
+      color: var(--text-faint);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .hero-aside {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .hero-card,
+    .section,
+    .spotlight,
+    .footer-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025)),
+        rgba(6, 10, 22, 0.88);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero-card {
+      padding: 22px;
+      border-radius: 28px;
+    }
+
+    .hero-card h2,
+    .section h2,
+    .section h3,
+    .card h3,
+    .stack-card h3,
+    .resource-card h3,
+    .mock h3,
+    .terminal-card h3 {
+      letter-spacing: -0.05em;
+    }
+
+    .hero-card h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .hero-card p {
+      margin: 0;
+      color: var(--text-soft);
+      line-height: 1.8;
+    }
+
+    .command-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .command-pill {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    .command-pill code {
+      color: white;
+      font-size: 13px;
+    }
+
+    .spotlight {
+      margin-top: 24px;
+      border-radius: 28px;
+      padding: 18px 22px;
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr);
+      gap: 20px;
+      align-items: center;
+    }
+
+    .spotlight-label {
+      display: grid;
+      gap: 4px;
+    }
+
+    .spotlight-label strong {
+      font-size: 13px;
+      color: var(--text-faint);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .spotlight-label span {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+    }
+
+    .spotlight-items {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .spotlight-item {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .spotlight-item strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .spotlight-item p {
+      margin: 0;
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .main {
+      display: grid;
+      gap: 24px;
+      margin-top: 26px;
+    }
+
+    .section {
+      border-radius: 30px;
+      padding: 30px;
+      scroll-margin-top: calc(var(--nav-h) + 16px);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.02;
+    }
+
+    .section-intro {
+      margin: 8px 0 0;
+      max-width: 820px;
+      color: var(--text-soft);
+      line-height: 1.9;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card,
+    .stack-card,
+    .resource-card,
+    .mock,
+    .terminal-card,
+    .timeline-card {
+      position: relative;
+      padding: 22px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+
+    .card::before,
+    .stack-card::before,
+    .resource-card::before,
+    .mock::before,
+    .terminal-card::before,
+    .timeline-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.22), transparent 70%);
+      pointer-events: none;
+    }
+
+    .card h3,
+    .stack-card h3,
+    .resource-card h3,
+    .mock h3,
+    .terminal-card h3,
+    .timeline-card h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+
+    .card p,
+    .stack-card p,
+    .resource-card p,
+    .mock p,
+    .terminal-card p,
+    .timeline-card p,
+    .list,
+    .field-label,
+    .tiny-note,
+    footer {
+      color: var(--text-soft);
+      line-height: 1.8;
+    }
+
+    .list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .timeline-card .step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,136,255,0.24), rgba(79,209,255,0.18));
+      color: white;
+      font-weight: 700;
+    }
+
+    .code-window,
+    .terminal-window {
+      overflow: hidden;
+      border-radius: 24px;
+      background: linear-gradient(180deg, #0b1225, #070b15);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .window-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      color: rgba(245,247,255,0.62);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .window-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .window-dots span:nth-child(1) { background: #ff6b6b; }
+    .window-dots span:nth-child(2) { background: #ffd166; }
+    .window-dots span:nth-child(3) { background: #4ce5b1; }
+
+    pre {
+      margin: 0;
+      padding: 18px;
+      font-size: 13px;
+      line-height: 1.85;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #edf3ff;
+    }
+
+    .copy-btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      color: #edf3ff;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      font-size: 12px;
+      transition: 0.2s ease;
+    }
+
+    .copy-btn:hover { background: rgba(255,255,255,0.12); }
+
+    .config-stack,
+    .resource-list,
+    .ccswitch-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .config-note,
+    .callout,
+    .sidebar-note,
+    .promo-note {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(124,136,255,0.12), rgba(79,209,255,0.08));
+      border: 1px solid rgba(124,136,255,0.18);
+      color: var(--text-soft);
+      line-height: 1.8;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .field {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
+    .field-value {
+      font-family: "Geist Mono", monospace;
+      color: white;
+      word-break: break-all;
+    }
+
+    .tabs {
+      display: inline-flex;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 18px;
+    }
+
+    .tabs button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--text-soft);
+      border-radius: 14px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .tabs button.active {
+      color: #08101f;
+      background: linear-gradient(135deg, #dfe4ff, #8fe1ff);
+      box-shadow: 0 10px 28px rgba(79, 209, 255, 0.22);
+    }
+
+    .ccswitch-panel { display: none; }
+    .ccswitch-panel.active { display: block; }
+
+    .path {
+      margin-bottom: 10px;
+      color: var(--text-faint);
+      font-family: "Geist Mono", monospace;
+      font-size: 13px;
+    }
+
+    .resource-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .resource-card {
+      display: grid;
+      gap: 12px;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .resource-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(124,136,255,0.22);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .resource-meta {
+      display: inline-flex;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-faint);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .footer-card {
+      margin-top: 24px;
+      border-radius: 28px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .footer-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 22px;
+      letter-spacing: -0.05em;
+    }
+
+    .tiny-note {
+      font-size: 13px;
+    }
+
+    @media (max-width: 1180px) {
+      .hero-grid,
+      .spotlight,
+      .grid-2,
+      .grid-3,
+      .grid-4,
+      .timeline,
+      .resource-list,
+      .footer-card {
+        grid-template-columns: 1fr;
+      }
+
+      .spotlight-items,
+      .hero-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --container: min(100% - 20px, 1320px);
+        --nav-h: auto;
+      }
+
+      .topbar-inner,
+      .section,
+      .hero-panel,
+      .footer-card {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .topbar-inner {
+        width: var(--container);
+        padding-top: 16px;
+        padding-bottom: 16px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        padding-top: 22px;
+      }
+
+      .hero-panel,
+      .section,
+      .spotlight,
+      .footer-card {
+        border-radius: 24px;
+      }
+
+      .hero-panel { padding-top: 24px; padding-bottom: 24px; }
+      .section { padding-top: 22px; padding-bottom: 22px; }
+      .spotlight { padding: 18px; }
+      .card, .stack-card, .resource-card, .mock, .terminal-card, .timeline-card { padding: 18px; border-radius: 20px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- 滚动进度条 -->
-    <div class="scroll-progress" id="scroll-progress"></div>
-
-    <!-- 返回顶部按钮 -->
-    <button class="back-to-top" id="back-to-top" onclick="scrollToTop()">↑</button>
-
-    <!-- 主题切换按钮 -->
-    <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
-        <span id="theme-icon">🌙</span>
-    </button>
-
-    <!-- 设置按钮 -->
-    <button class="settings-btn" onclick="toggleSettings()" title="设置">
-        <span>⚙️</span>
-    </button>
-
-    <!-- 设置面板遮罩 -->
-    <div class="settings-overlay" id="settings-overlay" onclick="toggleSettings()"></div>
-
-    <!-- 设置面板 -->
-    <div class="settings-panel" id="settings-panel">
-        <div class="settings-header">
-            <h2 class="settings-title">⚙️ 个性化设置</h2>
-            <button class="close-btn" onclick="toggleSettings()">✕</button>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#overview">
+        <div class="brand-mark">C</div>
+        <div class="brand-copy">
+          <strong>Codex 高级文档站</strong>
+          <span>Install · Config · IDE · CCSwitch</span>
         </div>
-
-        <!-- 个人信息设置 -->
-        <div class="settings-section">
-            <div class="settings-section-title">👤 个人信息</div>
-
-            <label class="settings-label">头像</label>
-            <div class="avatar-upload">
-                <div class="avatar-preview" id="avatar-preview">
-                    <span id="preview-emoji">👨‍💻</span>
-                    <img id="preview-image" style="display: none;">
-                </div>
-                <div id="image-input-container" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <input type="file" id="avatar-file-input" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
-                    <button class="upload-btn" onclick="document.getElementById('avatar-file-input').click()">📁 选择图片</button>
-                    <button class="upload-btn" onclick="removeAvatar()" style="background: rgba(102, 126, 234, 0.2); border-color: #667eea; color: #667eea;">🔄 恢复默认</button>
-                </div>
-            </div>
-
-            <label class="settings-label">名字</label>
-            <input type="text" class="settings-input" id="setting-name" placeholder="输入你的名字">
-
-            <label class="settings-label">个人简介</label>
-            <textarea class="settings-textarea" id="setting-bio" placeholder="介绍一下你自己"></textarea>
-
-            <label class="settings-label">状态</label>
-            <input type="text" class="settings-input" id="setting-status" placeholder="可以联系">
-
-            <label class="settings-label">生日</label>
-            <input type="date" class="settings-input" id="setting-birthday" placeholder="2000-01-01">
-
-        </div>
-
-        <!-- 联系方式设置 -->
-        <div class="settings-section">
-            <div class="settings-section-title">📱 联系方式</div>
-
-            <label class="settings-label">电话号码</label>
-            <input type="text" class="settings-input" id="setting-phone" placeholder="18325666364">
-
-            <label class="settings-label">邮箱地址</label>
-            <input type="email" class="settings-input" id="setting-email" placeholder="example@qq.com">
-        </div>
-
-        <!-- 社交链接设置 -->
-        <div class="settings-section">
-            <div class="settings-section-title">🔗 社交链接</div>
-
-            <label class="settings-label">GitHub 链接</label>
-            <input type="url" class="settings-input" id="setting-github" placeholder="https://github.com/username">
-
-            <label class="settings-label">微信号</label>
-            <input type="text" class="settings-input" id="setting-wechat" placeholder="你的微信号">
-
-            <label class="settings-label">QQ号</label>
-            <input type="text" class="settings-input" id="setting-qq" placeholder="你的QQ号">
-
-            <label class="settings-label">B站主页</label>
-            <input type="url" class="settings-input" id="setting-bilibili" placeholder="https://space.bilibili.com/xxx">
-        </div>
-
-        <!-- 技能标签设置 -->
-        <div class="settings-section">
-            <div class="settings-section-title">🚀 技能标签</div>
-            <div id="skills-container"></div>
-            <button class="add-skill-btn" onclick="addSkillInput()">+ 添加技能</button>
-        </div>
-
-        <!-- 保存和重置按钮 -->
-        <button class="save-btn" onclick="saveSettings()">💾 保存设置</button>
-        <button class="reset-btn" onclick="resetSettings()">🔄 恢复默认</button>
+      </a>
+      <nav class="nav">
+        <a href="#overview">概览</a>
+        <a href="#install">安装</a>
+        <a href="#config">配置</a>
+        <a href="#vscode">客户端</a>
+        <a href="#ccswitch">CCSwitch</a>
+        <a href="#refs">参考</a>
+      </nav>
     </div>
+  </header>
 
-    <div class="container">
-        <!-- 个人信息卡片 -->
-        <div class="profile-card">
-            <div class="avatar"><img src="0452193ac44fb409758a091f56f54bdf.png" alt="头像"></div>
-            <div class="greeting" id="greeting">👋 你好</div>
-            <h1>Hi, 我是 YJX</h1>
-            <p class="bio">
-                一个热爱编程的开发者 | 喜欢探索新技术 | 永远保持好奇心
-            </p>
-            <div class="status">
-                <span>可以联系</span>
+  <div class="shell">
+    <section class="hero" id="overview">
+      <div class="hero-panel">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow">OpenAI Codex · 2026-04-16 更新</span>
+            <h1>把 Codex 文档做成真正高级的展示页</h1>
+            <p class="lede">这一版不再只是“信息堆叠”，而是改成更像高端开发者产品官网的文档首页：更强首屏价值表达、更清晰的信息层级、更精致的代码窗口、更统一的深色设计系统，以及更好的阅读沉浸感。</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#install">开始安装</a>
+              <a class="btn btn-ghost" href="#ccswitch">查看 CCSwitch</a>
             </div>
-            <!-- 连续访问天数 -->
-            <div class="streak-badge" id="streak-badge" title="连续访问天数">
-                🔥 <span id="streak-count">1</span> 天
+            <div class="hero-metrics">
+              <div class="metric">
+                <strong>3 分钟</strong>
+                <span>完成安装、登录与第一条 Codex 命令。</span>
+              </div>
+              <div class="metric">
+                <strong>1 份配置</strong>
+                <span>覆盖用户级、项目级与临时命令切换逻辑。</span>
+              </div>
+              <div class="metric">
+                <strong>3 类接入</strong>
+                <span>CLI、VS Code / 客户端、CCSwitch 一次看全。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-aside">
+            <div class="terminal-window">
+              <div class="window-head">
+                <span>Quick Start</span>
+                <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              </div>
+              <pre>$ npm install -g @openai/codex
+$ codex
+$ codex -m gpt-5.4
+$ codex exec "review this repo"
+$ codex login --device-auth</pre>
             </div>
 
-            <!-- 社交链接 -->
-            <div class="social-links">
-                <a class="social-link" href="https://github.com/yjx-git001" target="_blank" title="GitHub">
-                    <div class="social-icon">🐙</div>
-                    <span class="social-label">GitHub</span>
-                </a>
-                <a class="social-link" href="#" onclick="copyToClipboard('微信号'); return false;" title="微信">
-                    <div class="social-icon">💬</div>
-                    <span class="social-label">微信</span>
-                </a>
-                <a class="social-link" href="#" onclick="copyToClipboard('QQ号'); return false;" title="QQ">
-                    <div class="social-icon">🐧</div>
-                    <span class="social-label">QQ</span>
-                </a>
-                <a class="social-link" href="#" onclick="copyToClipboard('B站'); return false;" title="B站">
-                    <div class="social-icon">📺</div>
-                    <span class="social-label">B站</span>
-                </a>
+            <div class="hero-card">
+              <h2>为什么这页更高级</h2>
+              <p>从“普通静态说明页”升级成“高质感产品文档首页”，重点在于：首屏更有张力、版式更通透、视觉统一度更高，且依然保留原来的安装、配置、模型、客户端与 CCSwitch 核心内容。</p>
+              <div class="command-list">
+                <div class="command-pill"><span>默认模型</span><code>gpt-5.4</code></div>
+                <div class="command-pill"><span>兼容地址</span><code>https://yjxapi-gpt.xyz/v1</code></div>
+                <div class="command-pill"><span>认证方式</span><code>ChatGPT / API key / device auth</code></div>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spotlight">
+        <div class="spotlight-label">
+          <strong>内容范围</strong>
+          <span>一页讲透</span>
+        </div>
+        <div class="spotlight-items">
+          <div class="spotlight-item">
+            <strong>安装与认证</strong>
+            <p>CLI 安装、首次运行、ChatGPT 登录、device auth 的最短路径。</p>
+          </div>
+          <div class="spotlight-item">
+            <strong>配置与模型</strong>
+            <p>用户级 / 项目级配置优先级、模型选择和临时切换方式。</p>
+          </div>
+          <div class="spotlight-item">
+            <strong>编辑器与代理层</strong>
+            <p>VS Code、兼容客户端、CCSwitch 的接入示例放到同一视觉系统里。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="main">
+      <section class="section" id="install">
+        <div class="section-head">
+          <div>
+            <span class="tiny-label">01 · Quickstart</span>
+            <h2>安装与启动</h2>
+            <p class="section-intro">保留原始文档重点，但重新组织成更清晰的路径：先装 CLI，再完成登录，最后在当前目录直接交给 Codex 执行任务。若远程环境拉不起浏览器，就切到 <code>codex login --device-auth</code>。</p>
+          </div>
         </div>
 
-        <!-- 功能卡片网格 -->
-        <div class="cards-grid">
-            <!-- 下班倒计时卡片 (移动到网格中) -->
-            <div class="card work-countdown-card-static" id="work-countdown-card">
-                <div class="countdown-icon">⏰</div>
-                <div class="countdown-title" id="countdown-title">距离下班还有</div>
-                <div class="countdown-time">
-                    <div class="time-block">
-                        <span class="time-value" id="hours">00</span>
-                        <span class="time-label">小时</span>
-                    </div>
-                    <div class="time-separator">:</div>
-                    <div class="time-block">
-                        <span class="time-value" id="minutes">00</span>
-                        <span class="time-label">分钟</span>
-                    </div>
-                    <div class="time-separator">:</div>
-                    <div class="time-block">
-                        <span class="time-value" id="seconds">00</span>
-                        <span class="time-label">秒</span>
-                    </div>
-                </div>
-                <div class="countdown-status" id="countdown-status">加油！坚持就是胜利 💪</div>
-            </div>
+        <div class="grid-2">
+          <div class="terminal-card">
+            <h3>安装命令</h3>
+            <div class="code-window">
+              <div class="window-head">
+                <span>Install</span>
+                <button class="copy-btn" data-copy="install-code">复制</button>
+              </div>
+              <pre id="install-code">npm install -g @openai/codex
+brew install codex
 
-            <!-- 联系方式卡片 -->
+codex</pre>
+            </div>
+          </div>
+
+          <div class="stack-card">
+            <h3>最快上手方式</h3>
+            <div class="timeline">
+              <div class="timeline-card">
+                <div class="step">1</div>
+                <h3>安装 CLI</h3>
+                <p>用 npm 或 Homebrew 直接安装，尽量保持环境简单干净。</p>
+              </div>
+              <div class="timeline-card">
+                <div class="step">2</div>
+                <h3>完成登录</h3>
+                <p>默认走 ChatGPT 登录；远程环境可使用 device auth。</p>
+              </div>
+              <div class="timeline-card">
+                <div class="step">3</div>
+                <h3>进入项目目录</h3>
+                <p>Codex 很适合在当前仓库上下文里直接执行任务。</p>
+              </div>
+              <div class="timeline-card">
+                <div class="step">4</div>
+                <h3>开始协作</h3>
+                <p>从 <code>codex</code> 或 <code>codex exec</code> 开始即可。</p>
+              </div>
+            </div>
+            <div class="callout" style="margin-top:18px;">登录状态一般会写入系统凭据库或 <code>~/.codex/auth.json</code>。公开页面里只保留占位符，不放真实密钥。</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="config">
+        <div class="section-head">
+          <div>
+            <span class="tiny-label">02 · Config</span>
+            <h2>配置与模型</h2>
+            <p class="section-intro">这一节改成更像高级产品文档的“策略层 + 实际配置”双栏展示：左边直接给出可复制配置，右边解释优先级和模型选择逻辑，让页面既好看又实用。</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="stack-card">
+            <h3>用户级默认配置</h3>
+            <div class="code-window">
+              <div class="window-head">
+                <span>~/.codex/config.toml</span>
+                <button class="copy-btn" data-copy="config-code">复制</button>
+              </div>
+              <pre id="config-code">model = "gpt-5.4"
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+cli_auth_credentials_store = "keyring"</pre>
+            </div>
+            <div class="config-note" style="margin-top:18px;">项目级覆盖放在仓库内的 <code>.codex/config.toml</code>；CLI flags 和 <code>--config</code> 优先级最高，其次才是 profile、项目级、用户级。</div>
+          </div>
+
+          <div class="config-stack">
             <div class="card">
-                <div class="card-title">📱 联系方式</div>
-                <div class="contact-links">
-                    <div class="contact-link" onclick="revealContact(this, 'tel:18325666364', '183-2566-6364')">
-                        <div class="icon">📞</div>
-                        <div class="contact-info">
-                            <span class="contact-label">电话</span>
-                            <span class="contact-value hidden">点击查看号码</span>
-                        </div>
-                    </div>
-
-                    <div class="contact-link" onclick="revealContact(this, 'mailto:3307852286@qq.com', '3307852286@qq.com')">
-                        <div class="icon">✉️</div>
-                        <div class="contact-info">
-                            <span class="contact-label">邮箱</span>
-                            <span class="contact-value hidden">点击查看邮箱</span>
-                        </div>
-                    </div>
-
-                    <div class="contact-link" onclick="revealContact(this, 'sms:18325666364', '183-2566-6364')">
-                        <div class="icon">💬</div>
-                        <div class="contact-info">
-                            <span class="contact-label">短信</span>
-                            <span class="contact-value hidden">点击查看号码</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="contact-tip">💡 点击两次可直接打开应用</div>
+              <h3>推荐模型</h3>
+              <ul class="list">
+                <li><code>gpt-5.4</code>：优先推荐，兼顾编码、推理和 agent 工作流。</li>
+                <li><code>gpt-5.4-mini</code>：更快更省，适合轻量任务或 subagents。</li>
+                <li><code>gpt-5.3-codex-spark</code>：更偏实时迭代；复杂工程也可考虑 <code>gpt-5.3-codex</code>。</li>
+              </ul>
             </div>
-
-            <!-- 技能标签卡片 -->
-            <div class="card card-3d">
-                <div class="card-title">🚀 技能标签</div>
-                <div class="skills">
-                    <span class="skill-tag">JavaScript</span>
-                    <span class="skill-tag">Python</span>
-                    <span class="skill-tag">HTML/CSS</span>
-                    <span class="skill-tag">React</span>
-                    <span class="skill-tag">Node.js</span>
-                    <span class="skill-tag">Git</span>
-                    <span class="skill-tag">Vue</span>
-                    <span class="skill-tag">TypeScript</span>
-                </div>
-                <div class="time-display" id="current-time"></div>
-                <div class="music-visualizer">
-                    <div class="music-bar"></div>
-                    <div class="music-bar"></div>
-                    <div class="music-bar"></div>
-                    <div class="music-bar"></div>
-                    <div class="music-bar"></div>
-                    <div class="music-bar"></div>
-                    <div class="music-bar"></div>
-                </div>
-            </div>
-
-
-            <!-- 天气卡片 -->
             <div class="card">
-                <div class="card-title">
-                    🌤️ 天气预报
-                    <button class="weather-refresh-btn" onclick="refreshWeather()" title="刷新天气">🔄</button>
+              <h3>临时切换方式</h3>
+              <p>新开线程时直接用 <code>codex -m gpt-5.4</code>。正在进行中的会话，可以用 <code>/model</code> 快速切换，而不必改动默认配置。</p>
+            </div>
+            <div class="card">
+              <h3>项目信任机制</h3>
+              <p>如果项目没有被信任，Codex 会跳过项目级 <code>.codex/</code> 配置。因此“配置写了但没生效”时，优先检查项目信任状态。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="vscode">
+        <div class="section-head">
+          <div>
+            <span class="tiny-label">03 · IDE & Clients</span>
+            <h2>VS Code 与兼容客户端</h2>
+            <p class="section-intro">这一块改成更现代的三列信息卡：既能保留文档说明，又像产品官网里的功能模块。视觉上更整洁，也更容易扫读。</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <h3>VS Code</h3>
+            <p>安装 Codex 扩展后，通常能和 CLI 共用配置与登录态。看不到侧栏时，重启编辑器通常能恢复。</p>
+          </div>
+          <div class="card">
+            <h3>兼容客户端</h3>
+            <p>Cherry、Roo、Kilo 等客户端建议按 OpenAI 兼容方式配置，优先走 Responses API，减少后续兼容问题。</p>
+          </div>
+          <div class="mock">
+            <h3>接入示意</h3>
+            <div class="field-grid">
+              <div class="field">
+                <span class="field-label">API Key</span>
+                <div class="field-value">sk-********************************</div>
+              </div>
+              <div class="field">
+                <span class="field-label">Base URL</span>
+                <div class="field-value">https://yjxapi-gpt.xyz/v1</div>
+              </div>
+              <div class="field">
+                <span class="field-label">Model</span>
+                <div class="field-value">gpt-5.4</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="ccswitch">
+        <div class="section-head">
+          <div>
+            <span class="tiny-label">04 · Proxy Layer</span>
+            <h2>CCSwitch 配置</h2>
+            <p class="section-intro">这一节重新做成更高级的标签切换面板，减少原先“普通文档块”的观感。请求地址继续保持为 <code>https://yjxapi-gpt.xyz/v1</code>，真实密钥仍然只用占位符演示。</p>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="CCSwitch OS switcher">
+          <button class="active" type="button" role="tab" aria-selected="true" data-os-tab="mac">macOS / Linux</button>
+          <button type="button" role="tab" aria-selected="false" data-os-tab="win">Windows</button>
+        </div>
+
+        <div class="ccswitch-panel active" data-os-panel="mac">
+          <div class="ccswitch-stack">
+            <div class="stack-card">
+              <div class="path">~/.codex/config.toml</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>CCSwitch macOS / Linux</span>
+                  <button class="copy-btn" data-copy="ccswitch-mac">复制</button>
                 </div>
-                <div class="weather-main" id="weather-main">
-                    <div class="weather-loading">
-                        <div class="loading-spinner"></div>
-                        <div>正在获取天气...</div>
-                    </div>
-                </div>
-                <div class="weather-forecast" id="weather-forecast"></div>
-                <div class="weather-tip" id="weather-tip">💡 天气根据位置自动获取</div>
+                <pre id="ccswitch-mac">model_provider = "OpenAI"
+model = "gpt-5.4"
+review_model = "gpt-5.4"
+model_reasoning_effort = "xhigh"
+disable_response_storage = true
+network_access = "enabled"
+windows_wsl_setup_acknowledged = true
+model_context_window = 1000000
+model_auto_compact_token_limit = 900000
+
+[model_providers.OpenAI]
+name = "OpenAI"
+base_url = "https://yjxapi-gpt.xyz/v1"
+wire_api = "responses"
+requires_openai_auth = true</pre>
+              </div>
             </div>
 
-            <!-- 倒计时卡片 -->
-            <div class="card card-3d">
-                <div class="card-title">⏰ 重要日期</div>
-                <div class="countdown-container">
-                    <div class="countdown-item">
-                        <div class="countdown-label">🎉 距离春节</div>
-                        <div class="countdown-value" id="countdown-spring">计算中...</div>
-                    </div>
-                    <div class="countdown-item">
-                        <div class="countdown-label">🎂 距离生日</div>
-                        <div class="countdown-value" id="countdown-birthday">计算中...</div>
-                    </div>
+            <div class="stack-card">
+              <div class="path">~/.codex/auth.json</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>Auth Example</span>
+                  <button class="copy-btn" data-copy="auth-mac">复制</button>
                 </div>
+                <pre id="auth-mac">{
+  "OPENAI_API_KEY": "sk-你的密钥"
+}</pre>
+              </div>
             </div>
-
-            <div class="card card-3d visitor-trend-card">
-                <div class="card-title">📈 访问趋势</div>
-                <canvas id="visitor-trend" height="120"></canvas>
-                <div class="trend-summary" id="trend-summary"></div>
-            </div>
+          </div>
         </div>
 
-        <!-- 星空背景容器 -->
-        <div class="starfield" id="starfield"></div>
-
-        <div class="footer">
-            Made with ❤️ by YJX | © 2026
-        </div>
-    </div>
-
-    <!-- AI聊天按钮 -->
-    <button class="ai-chat-btn" id="ai-chat-btn" onclick="toggleAIChat()" title="AI助手">🤖</button>
-    <div class="ai-coachmark" id="ai-coachmark">
-        <div class="ai-coach-bubble">有什么都可以问我哦</div>
-        <div class="ai-coach-arrow"></div>
-        <button class="ai-coach-close" onclick="dismissAICoachmark()">✕</button>
-    </div>
-
-    <!-- AI聊天窗口 -->
-    <div class="ai-chat-window" id="ai-chat-window">
-        <div class="ai-chat-header">
-            <h3>🤖 AI助手</h3>
-            <div style="display: flex; gap: 8px;">
-                <button class="ai-chat-close" onclick="openAISettings()" title="API设置">⚙️</button>
-                <button class="ai-chat-close" onclick="toggleAIChat()">✕</button>
-            </div>
-        </div>
-        <div class="ai-chat-messages" id="ai-chat-messages">
-            <div class="ai-message assistant">你好！Mr Yin，有什么可以帮你的吗？</div>
-        </div>
-        <div class="ai-chat-input">
-            <input type="text" id="ai-input" placeholder="输入消息..." onkeypress="handleAIInputKeypress(event)">
-            <button id="ai-send-btn" onclick="sendAIMessage()">➤</button>
-        </div>
-    </div>
-
-    <!-- AI设置弹窗 -->
-    <div class="settings-overlay" id="ai-settings-overlay" onclick="closeAISettings()"></div>
-    <div class="ai-settings-panel" id="ai-settings-panel">
-        <div class="settings-header">
-            <h2 class="settings-title">🤖 AI配置</h2>
-            <button class="close-btn" onclick="closeAISettings()">✕</button>
-        </div>
-        <div id="ai-panel-locked" style="text-align: center; padding: 40px 20px;">
-            <p style="font-size: 48px; margin-bottom: 20px;">🔒</p>
-            <p style="font-size: 14px; color: #718096; margin-bottom: 20px;">需要密码才能查看和修改API配置</p>
-            <button class="save-btn" onclick="unlockAIPanel()">🔓 输入密码解锁</button>
-        </div>
-        <div id="ai-panel-unlocked" style="display: none;">
-            <div class="settings-section">
-                <label class="settings-label">AI 模型</label>
-                <select class="settings-input" id="ai-setting-model" onchange="onAIModelChange()" style="margin-bottom: 12px;">
-                    <option value="deepseek">DeepSeek</option>
-                    <option value="claude">Claude</option>
-                    <option value="custom">自定义</option>
-                </select>
-                <label class="settings-label">API Base URL</label>
-                <input type="text" class="settings-input" id="ai-setting-url" placeholder="https://api.deepseek.com">
-                <label class="settings-label">模型名称</label>
-                <input type="text" class="settings-input" id="ai-setting-model-name" placeholder="deepseek-chat" style="margin-bottom: 12px;">
-                <label class="settings-label">API Key</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <input type="password" class="settings-input" id="ai-setting-key" placeholder="sk-xxxxxxxx" style="flex: 1; margin-bottom: 0;">
-                    <button class="upload-btn" onclick="toggleAIKeyVisibility()">👁️</button>
+        <div class="ccswitch-panel" data-os-panel="win">
+          <div class="ccswitch-stack">
+            <div class="stack-card">
+              <div class="path">%userprofile%\.codex\config.toml</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>CCSwitch Windows</span>
+                  <button class="copy-btn" data-copy="ccswitch-win">复制</button>
                 </div>
-                <p style="font-size: 11px; color: #e53e3e; margin-bottom: 16px;">⚠️ API Key会保存在浏览器中，请勿在公共设备上使用</p>
+                <pre id="ccswitch-win">model_provider = "OpenAI"
+model = "gpt-5.4"
+review_model = "gpt-5.4"
+model_reasoning_effort = "xhigh"
+disable_response_storage = true
+network_access = "enabled"
+windows_wsl_setup_acknowledged = true
+model_context_window = 1000000
+model_auto_compact_token_limit = 900000
+
+[model_providers.OpenAI]
+name = "OpenAI"
+base_url = "https://yjxapi-gpt.xyz/v1"
+wire_api = "responses"
+requires_openai_auth = true</pre>
+              </div>
             </div>
-            <button class="save-btn" onclick="saveAISettings()">💾 保存配置</button>
-            <button class="reset-btn" onclick="resetAISettings()">🔄 恢复默认</button>
-        </div>
-    </div>
 
-    <script>
-        // 默认配置
-        const defaultConfig = {
-            name: 'YJX',
-            avatarImage: '0452193ac44fb409758a091f56f54bdf.png', // 头像图片路径
-            bio: '一个热爱编程的开发者 | 喜欢探索新技术 | 永远保持好奇心',
-            status: '可以联系',
-            phone: '18325666364',
-            email: '3307852286@qq.com',
-            github: 'https://github.com/yjx-git001',
-            wechat: 'Y18325666364',
-            qq: '3307852286',
-            bilibili: 'https://www.bilibili.com/',
-            skills: ['JavaScript', 'Python', 'HTML/CSS', 'React', 'Node.js', 'Git', 'Vue', 'TypeScript', 'Go', 'Gin'],
-            birthday: '2002-06-13', // 生日
-            aiProvider: 'deepseek', // AI提供商
-            apiUrl: 'https://api.deepseek.com', // AI API地址
-            apiKey: 'sk-1878f8e76b604a76a5eebfc2ccb741ef', // AI API Key
-            aiModelName: 'deepseek-chat', // AI模型名称
-            city: '', // 城市（空则自动获取）
-            latitude: null, // 纬度
-            longitude: null, // 经度
-        };
-
-        // AI提供商预设配置
-        const aiProviderPresets = {
-            deepseek: { url: 'https://api.deepseek.com', model: 'deepseek-chat' },
-            claude: { url: 'https://api.anthropic.com', model: 'claude-3-5-sonnet-20241022' },
-            custom: { url: '', model: '' }
-        };
-
-        // 加载配置
-        function loadConfig() {
-            const saved = localStorage.getItem('pageConfig');
-            if (saved) {
-                const savedConfig = JSON.parse(saved);
-                // 默认配置优先，但头像允许用户自定义
-                const merged = { ...savedConfig, ...defaultConfig };
-                // 如果用户上传了自定义头像（base64格式），使用用户的头像
-                if (savedConfig.avatarImage && savedConfig.avatarImage.startsWith('data:')) {
-                    merged.avatarImage = savedConfig.avatarImage;
-                }
-                return merged;
-            }
-            return { ...defaultConfig };
-        }
-
-        // 保存配置
-        function saveConfig(config) {
-            localStorage.setItem('pageConfig', JSON.stringify(config));
-        }
-
-        // 当前配置
-        let currentConfig = loadConfig();
-
-        // 应用配置到页面
-        function applyConfig() {
-            // 更新头像
-            const avatarElement = document.querySelector('.avatar');
-            if (currentConfig.avatarImage) {
-                avatarElement.innerHTML = `<img src="${currentConfig.avatarImage}" alt="头像">`;
-            } else {
-                avatarElement.innerHTML = `<span class="avatar-emoji">👨‍💻</span>`;
-            }
-
-            // 更新个人信息
-            document.querySelector('h1').textContent = `Hi, 我是 ${currentConfig.name}`;
-            document.querySelector('.bio').textContent = currentConfig.bio;
-            document.querySelector('.status span').textContent = currentConfig.status;
-
-            // 更新联系方式
-            const phoneLink = document.querySelector('[href^="tel:"]');
-            if (phoneLink) {
-                phoneLink.setAttribute('onclick', `revealContact(this, 'tel:${currentConfig.phone}', '${formatPhone(currentConfig.phone)}')`);
-            }
-
-            const emailLink = document.querySelector('[href^="mailto:"]');
-            if (emailLink) {
-                emailLink.setAttribute('onclick', `revealContact(this, 'mailto:${currentConfig.email}', '${currentConfig.email}')`);
-            }
-
-            const smsLink = document.querySelector('[href^="sms:"]');
-            if (smsLink) {
-                smsLink.setAttribute('onclick', `revealContact(this, 'sms:${currentConfig.phone}', '${formatPhone(currentConfig.phone)}')`);
-            }
-
-            // 更新社交链接
-            const socialLinks = document.querySelectorAll('.social-link');
-            if (socialLinks[0]) socialLinks[0].href = currentConfig.github;
-            if (socialLinks[1]) socialLinks[1].setAttribute('onclick', `copyToClipboard('${currentConfig.wechat}'); return false;`);
-            if (socialLinks[2]) socialLinks[2].setAttribute('onclick', `copyToClipboard('${currentConfig.qq}'); return false;`);
-            if (socialLinks[3]) socialLinks[3].setAttribute('onclick', `copyToClipboard('${currentConfig.bilibili}'); return false;`);
-
-            // 更新技能标签
-            const skillsContainer = document.querySelector('.skills');
-            skillsContainer.innerHTML = currentConfig.skills.map(skill =>
-                `<span class="skill-tag">${skill}</span>`
-            ).join('');
-        }
-
-        // 格式化电话号码
-        function formatPhone(phone) {
-            return phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-        }
-
-        // 打开/关闭设置面板
-        function toggleSettings() {
-            const panel = document.getElementById('settings-panel');
-            const overlay = document.getElementById('settings-overlay');
-
-            // 如果面板已经打开，直接关闭
-            if (panel.classList.contains('open')) {
-                panel.classList.remove('open');
-                overlay.classList.remove('open');
-                return;
-            }
-
-            // 如果面板未打开，需要验证密码
-            const password = prompt('请输入设置密码：');
-            if (password === '88888888') {
-                panel.classList.add('open');
-                overlay.classList.add('open');
-                loadSettingsToForm();
-            } else if (password !== null) {
-                // 用户输入了错误密码（不是点击取消）
-                showNotification('❌ 密码错误，无法进入设置');
-            }
-        }
-
-        // 加载设置到表单
-        function loadSettingsToForm() {
-            document.getElementById('setting-name').value = currentConfig.name;
-            document.getElementById('setting-bio').value = currentConfig.bio;
-            document.getElementById('setting-status').value = currentConfig.status;
-            document.getElementById('setting-phone').value = currentConfig.phone;
-            document.getElementById('setting-email').value = currentConfig.email;
-            document.getElementById('setting-github').value = currentConfig.github;
-            document.getElementById('setting-wechat').value = currentConfig.wechat;
-            document.getElementById('setting-qq').value = currentConfig.qq;
-            document.getElementById('setting-bilibili').value = currentConfig.bilibili;
-
-            // 设置生日
-            document.getElementById('setting-birthday').value = currentConfig.birthday || '2000-01-01';
-
-            // 更新头像预览
-            updateAvatarPreview();
-
-            // 加载技能标签
-            renderSkillInputs();
-        }
-
-
-        // 更新头像预览
-        function updateAvatarPreview() {
-            const previewEmoji = document.getElementById('preview-emoji');
-            const previewImage = document.getElementById('preview-image');
-
-            if (currentConfig.avatarImage) {
-                previewEmoji.style.display = 'none';
-                previewImage.style.display = 'block';
-                previewImage.src = currentConfig.avatarImage;
-            } else {
-                previewEmoji.style.display = 'block';
-                previewImage.style.display = 'none';
-            }
-        }
-
-        // 处理头像上传
-        function handleAvatarUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // 检查文件类型
-            if (!file.type.startsWith('image/')) {
-                alert('请选择图片文件！');
-                return;
-            }
-
-            // 检查文件大小（限制为2MB）
-            if (file.size > 2 * 1024 * 1024) {
-                alert('图片大小不能超过2MB！');
-                return;
-            }
-
-            // 读取文件并转换为base64
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentConfig.avatarImage = e.target.result;
-                updateAvatarPreview();
-                showNotification('✅ 图片已上传，记得保存设置！');
-            };
-            reader.onerror = function() {
-                alert('图片读取失败，请重试！');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // 移除头像图片（恢复默认头像）
-        function removeAvatar() {
-            if (confirm('确定要恢复默认头像吗？')) {
-                currentConfig.avatarImage = defaultConfig.avatarImage;
-                document.getElementById('avatar-file-input').value = '';
-                updateAvatarPreview();
-                showNotification('✅ 已恢复默认头像');
-            }
-        }
-
-        // 渲染技能输入框
-        function renderSkillInputs() {
-            const container = document.getElementById('skills-container');
-            container.innerHTML = currentConfig.skills.map((skill, index) => `
-                <div class="skill-input-group">
-                    <input type="text" class="settings-input" value="${skill}" data-skill-index="${index}">
-                    <button class="remove-skill-btn" onclick="removeSkill(${index})">✕</button>
+            <div class="stack-card">
+              <div class="path">%userprofile%\.codex\auth.json</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>Auth Example</span>
+                  <button class="copy-btn" data-copy="auth-win">复制</button>
                 </div>
-            `).join('');
+                <pre id="auth-win">{
+  "OPENAI_API_KEY": "sk-你的密钥"
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="refs">
+        <div class="section-head">
+          <div>
+            <span class="tiny-label">05 · References</span>
+            <h2>官方参考</h2>
+            <p class="section-intro">为了更稳地使用，继续保留 Help Center 与 GitHub 入口，并把它们做成更像“资源卡片”的样式。这样视觉更统一，也比普通链接列表更有高级感。</p>
+          </div>
+        </div>
+
+        <div class="resource-list">
+          <a class="resource-card" href="https://help.openai.com/en/articles/11096431-openai-codex-ci-getting-started" target="_blank" rel="noreferrer">
+            <span class="resource-meta">OpenAI Help</span>
+            <h3>Codex CLI Getting Started</h3>
+            <p>安装、认证、Suggest / Auto Edit / Full Auto 的基础入口。</p>
+          </a>
+          <a class="resource-card" href="https://help.openai.com/en/articles/11381614" target="_blank" rel="noreferrer">
+            <span class="resource-meta">OpenAI Help</span>
+            <h3>Codex CLI and Sign in with ChatGPT</h3>
+            <p>ChatGPT 登录、自动生成 key、device auth 的说明页。</p>
+          </a>
+          <a class="resource-card" href="https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan" target="_blank" rel="noreferrer">
+            <span class="resource-meta">OpenAI Help</span>
+            <h3>Using Codex with your ChatGPT plan</h3>
+            <p>Codex 能力说明、计划限制，以及终端与 IDE 的使用入口。</p>
+          </a>
+          <a class="resource-card" href="https://github.com/openai/codex" target="_blank" rel="noreferrer">
+            <span class="resource-meta">GitHub</span>
+            <h3>OpenAI Codex Repository</h3>
+            <p>CLI 仓库、README、安装说明和 issue 反馈入口。</p>
+          </a>
+        </div>
+
+        <div class="footer-card">
+          <div>
+            <strong>后续还可以继续往“高级文档站”方向迭代</strong>
+            <footer>如果你接下来还想加入 Cherry、Roo、Kilo 的专属接入块、架构图、FAQ、对比表甚至截图式模块，这个新版结构已经更适合继续扩展，而不用退回到普通个人主页样式。</footer>
+          </div>
+          <a class="btn btn-primary" href="#overview">回到顶部</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const target = document.getElementById(button.dataset.copy);
+        if (!target) return;
+        const original = button.textContent;
+        try {
+          await navigator.clipboard.writeText(target.textContent.trim());
+          button.textContent = 'Copied';
+        } catch (error) {
+          console.error(error);
+          button.textContent = 'Failed';
         }
+        window.setTimeout(() => {
+          button.textContent = original;
+        }, 1200);
+      });
+    });
 
-        // 添加技能输入框
-        function addSkillInput() {
-            currentConfig.skills.push('');
-            renderSkillInputs();
-        }
+    const osTabs = document.querySelectorAll('[data-os-tab]');
+    const osPanels = document.querySelectorAll('[data-os-panel]');
 
-        // 删除技能
-        function removeSkill(index) {
-            currentConfig.skills.splice(index, 1);
-            renderSkillInputs();
-        }
-
-        // 保存设置
-        function saveSettings() {
-            // 收集表单数据
-            currentConfig.name = document.getElementById('setting-name').value || 'YJX';
-            currentConfig.bio = document.getElementById('setting-bio').value || '一个热爱编程的开发者';
-            currentConfig.status = document.getElementById('setting-status').value || '可以联系';
-            currentConfig.phone = document.getElementById('setting-phone').value || '18325666364';
-            currentConfig.email = document.getElementById('setting-email').value || 'example@qq.com';
-            currentConfig.github = document.getElementById('setting-github').value || 'https://github.com';
-            currentConfig.wechat = document.getElementById('setting-wechat').value || '微信号';
-            currentConfig.qq = document.getElementById('setting-qq').value || 'QQ号';
-            currentConfig.bilibili = document.getElementById('setting-bilibili').value || 'B站';
-
-            // 收集生日
-            currentConfig.birthday = document.getElementById('setting-birthday').value || '2000-01-01';
-
-            // 收集技能标签
-            const skillInputs = document.querySelectorAll('[data-skill-index]');
-            currentConfig.skills = Array.from(skillInputs).map(input => input.value).filter(v => v.trim());
-
-            // 保存到localStorage
-            saveConfig(currentConfig);
-
-            // 应用到页面
-            applyConfig();
-
-            // 更新倒计时
-            updateCountdowns();
-
-            // 关闭面板
-            toggleSettings();
-
-            // 显示提示
-            showNotification('✅ 设置已保存！');
-        }
-
-        // 重置设置
-        function resetSettings() {
-            if (confirm('确定要恢复默认设置吗？这将清除所有自定义内容。')) {
-                currentConfig = { ...defaultConfig };
-                saveConfig(currentConfig);
-                applyConfig();
-                loadSettingsToForm();
-                showNotification('✅ 已恢复默认设置！');
-            }
-        }
-
-        // 页面加载时应用配置
-        window.addEventListener('DOMContentLoaded', () => {
-            applyConfig();
-            startWorkCountdown();
-            initWeather();
-            if (!localStorage.getItem('aiCoachDismissed')) {
-                const cm = document.getElementById('ai-coachmark');
-                if (cm) {
-                    cm.classList.add('open');
-                    positionAICoachmark();
-                    window.addEventListener('resize', positionAICoachmark);
-                    window.addEventListener('scroll', positionAICoachmark, { passive: true });
-                }
-            }
+    osTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.osTab;
+        osTabs.forEach((item) => {
+          const active = item.dataset.osTab === target;
+          item.classList.toggle('active', active);
+          item.setAttribute('aria-selected', active ? 'true' : 'false');
         });
-
-        // ========== 天气功能 ==========
-        let currentWeatherData = null;
-
-        function initWeather() {
-            // 检查缓存
-            if (checkWeatherCache()) {
-                console.log('使用缓存的天气数据');
-                return;
-            }
-            // 获取位置
-            getLocation();
-        }
-
-        function checkWeatherCache() {
-            const cache = localStorage.getItem('weatherCache');
-            if (!cache) return false;
-
-            try {
-                const { timestamp, data, cityName, configCity } = JSON.parse(cache);
-                // 缓存有效期 30 分钟
-                if (Date.now() - timestamp < 30 * 60 * 1000) {
-                    // 如果配置的城市改变了，缓存失效
-                    if ((currentConfig.city || '') !== (configCity || '')) {
-                        return false;
-                    }
-                    processWeatherData(data, cityName, true);
-                    return true;
-                }
-            } catch (e) {
-                console.error('Cache check error', e);
-            }
-            return false;
-        }
-
-        function getLocation() {
-            // 显示加载状态
-            const mainEl = document.getElementById('weather-main');
-            if (mainEl) {
-                mainEl.innerHTML = `
-                    <div class="weather-loading">
-                        <div class="loading-spinner"></div>
-                        <div>正在获取位置和天气...</div>
-                    </div>
-                `;
-            }
-
-            // 1. 优先使用手动设置的城市 (最快)
-            if (currentConfig.city) {
-                getWeatherByCity(currentConfig.city);
-                return;
-            }
-
-            // 2. 并行获取策略 (Race + Upgrade)
-            // 立即启动IP定位 (速度快)
-            let ipFetchDone = false;
-            
-            // 封装IP获取
-            const ipPromise = new Promise(async (resolve) => {
-                try {
-                    await getWeatherByIP(false); // false = 暂不报错
-                    ipFetchDone = true;
-                    resolve(true);
-                } catch(e) {
-                    resolve(false);
-                }
-            });
-
-            // 尝试使用 Geolocation (精度高)
-            if (navigator.geolocation) {
-                // 如果IP获取很快完成，用户先看到IP结果
-                // 如果Geolocation随后完成，会更新为更精确的结果
-                
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        currentConfig.latitude = lat;
-                        currentConfig.longitude = lon;
-                        saveConfig(currentConfig);
-                        
-                        // 获取精确天气
-                        getWeatherByCoords(lat, lon).then(() => {
-                            // 如果之前显示的是IP定位的结果，这里会无缝更新为精确结果
-                            showNotification('📍 已更新为精确位置');
-                        });
-                    },
-                    (error) => {
-                        console.log('获取位置失败:', error);
-                        // 如果Geolocation失败，确保IP获取已执行
-                        if (!ipFetchDone) {
-                            // 如果IP还没完成，它会自动完成
-                            // 如果IP已经完成，什么都不用做
-                        }
-                    },
-                    {
-                        enableHighAccuracy: false, // 速度优先
-                        timeout: 4000, // 4秒超时
-                        maximumAge: 600000 // 10分钟缓存
-                    }
-                );
-            }
-            
-            // 始终执行IP获取作为保底和快速展示
-            // 注意：这里不需要 await，让它在后台跑
-            getWeatherByIP(true);
-        }
-
-        // 通过城市名获取天气
-        async function getWeatherByCity(city) {
-            try {
-                const response = await fetch(`https://wttr.in/${encodeURIComponent(city)}?format=j1&lang=zh`);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                processWeatherData(data, city);
-            } catch (error) {
-                console.error('获取城市天气失败:', error);
-                showWeatherError();
-            }
-        }
-
-        // 通过IP获取天气（备用方案）
-        // silenceError: 是否静默失败（不显示错误UI），用于Race模式
-        async function getWeatherByIP(showError = true) {
-            try {
-                const response = await fetch('https://wttr.in/?format=j1&lang=zh');
-                const data = await response.json();
-                
-                // 如果此时已经有更精确的数据（比如Geolocation刚好先完成了），则不渲染
-                // 这里可以通过检查 currentConfig.latitude 来判断是否刚刚更新了精确位置？
-                // 简化起见，直接渲染，Geolocation回来后会覆盖
-                processWeatherData(data);
-            } catch (error) {
-                console.error('IP定位天气获取失败:', error);
-                if (showError) showWeatherError();
-                throw error;
-            }
-        }
-
-        async function getWeatherByCoords(lat, lon) {
-            try {
-                // 使用 wttr.in 免费API，传入经纬度
-                const response = await fetch(`https://wttr.in/${lat},${lon}?format=j1&lang=zh`);
-                const data = await response.json();
-                processWeatherData(data);
-            } catch (error) {
-                console.error('获取天气失败:', error);
-                showWeatherError();
-            }
-        }
-
-        function processWeatherData(data, cityName, fromCache = false) {
-            try {
-                const current = data.current_condition[0];
-                const forecast = data.weather;
-                const area = data.nearest_area ? data.nearest_area[0] : null;
-                
-                const resolvedCityName = cityName || (area ? area.areaName[0].value : '未知');
-
-                currentWeatherData = {
-                    city: resolvedCityName,
-                    temp: current.temp_C,
-                    feelsLike: current.FeelsLikeC,
-                    humidity: current.humidity,
-                    windSpeed: current.windspeedKmph,
-                    desc: current.lang_zh && current.lang_zh[0] ? current.lang_zh[0].value : current.weatherDesc[0].value,
-                    code: current.weatherCode,
-                    forecast: forecast.slice(0, 3).map(day => ({
-                        date: day.date,
-                        maxTemp: day.maxtempC,
-                        minTemp: day.mintempC,
-                        code: day.hourly[4].weatherCode,
-                        desc: day.hourly[4].lang_zh && day.hourly[4].lang_zh[0] ? day.hourly[4].lang_zh[0].value : day.hourly[4].weatherDesc[0].value
-                    }))
-                };
-
-                if (!fromCache) {
-                    localStorage.setItem('weatherCache', JSON.stringify({
-                        timestamp: Date.now(),
-                        data: data,
-                        cityName: resolvedCityName,
-                        configCity: currentConfig.city || ''
-                    }));
-                }
-
-                renderWeather();
-                updateWeatherReminder();
-            } catch (error) {
-                console.error('解析天气数据失败:', error);
-                showWeatherError();
-            }
-        }
-
-        function getWeatherIcon(code) {
-            const codeNum = parseInt(code);
-            // 天气代码映射到emoji
-            if (codeNum === 113) return '☀️'; // 晴
-            if (codeNum === 116) return '⛅'; // 多云
-            if (codeNum === 119 || codeNum === 122) return '☁️'; // 阴
-            if (codeNum >= 176 && codeNum <= 263) return '🌧️'; // 小雨
-            if (codeNum >= 266 && codeNum <= 299) return '🌧️'; // 雨
-            if (codeNum >= 302 && codeNum <= 356) return '⛈️'; // 大雨/雷雨
-            if (codeNum >= 359 && codeNum <= 395) return '🌨️'; // 雪
-            if (codeNum === 143 || codeNum === 248 || codeNum === 260) return '🌫️'; // 雾
-            return '🌤️'; // 默认
-        }
-
-        function renderWeather() {
-            if (!currentWeatherData) return;
-
-            const mainEl = document.getElementById('weather-main');
-            const forecastEl = document.getElementById('weather-forecast');
-            const tipEl = document.getElementById('weather-tip');
-
-            // 渲染当前天气
-            mainEl.innerHTML = `
-                <div class="weather-current">
-                    <div class="weather-icon-large">${getWeatherIcon(currentWeatherData.code)}</div>
-                    <div class="weather-info">
-                        <div class="weather-city">
-                            📍 ${currentWeatherData.city}
-                        </div>
-                        <div class="weather-temp">${currentWeatherData.temp}°C</div>
-                        <div class="weather-desc">${currentWeatherData.desc}</div>
-                    </div>
-                </div>
-                <div class="weather-details">
-                    <div class="weather-detail-item">
-                        <div class="weather-detail-label">体感温度</div>
-                        <div class="weather-detail-value">${currentWeatherData.feelsLike}°C</div>
-                    </div>
-                    <div class="weather-detail-item">
-                        <div class="weather-detail-label">湿度</div>
-                        <div class="weather-detail-value">${currentWeatherData.humidity}%</div>
-                    </div>
-                    <div class="weather-detail-item">
-                        <div class="weather-detail-label">风速</div>
-                        <div class="weather-detail-value">${currentWeatherData.windSpeed}km/h</div>
-                    </div>
-                </div>
-            `;
-
-            // 渲染天气预报
-            const days = ['今天', '明天', '后天'];
-            forecastEl.innerHTML = currentWeatherData.forecast.map((day, index) => `
-                <div class="forecast-item">
-                    <div class="forecast-date">${days[index]}</div>
-                    <div class="forecast-icon">${getWeatherIcon(day.code)}</div>
-                    <div class="forecast-temp">${day.minTemp}°~${day.maxTemp}°</div>
-                </div>
-            `).join('');
-
-            // 生成天气提示
-            tipEl.innerHTML = generateWeatherTip();
-        }
-
-        function generateWeatherTip() {
-            if (!currentWeatherData) return '💡 天气根据位置自动获取';
-
-            const temp = parseInt(currentWeatherData.temp);
-            const code = parseInt(currentWeatherData.code);
-            const tips = [];
-
-            // 根据天气代码判断
-            if (code >= 176 && code <= 395) {
-                // 雨雪天气
-                if (code >= 359) {
-                    tips.push('🌨️ 今天有雪，注意保暖防滑！');
-                } else {
-                    tips.push('🌂 今天有雨，记得带伞！');
-                }
-            }
-
-            // 根据温度判断
-            if (temp >= 35) {
-                tips.push('🥵 高温预警！注意防暑降温，多喝水');
-            } else if (temp >= 30) {
-                tips.push('☀️ 天气炎热，注意防晒补水');
-            } else if (temp <= 0) {
-                tips.push('🥶 气温极低，注意防寒保暖！');
-            } else if (temp <= 10) {
-                tips.push('🧥 天气较冷，记得添衣保暖');
-            } else if (temp >= 20 && temp <= 26) {
-                tips.push('😊 温度舒适，适合外出活动');
-            }
-
-            // 雾霾天气
-            if (code === 143 || code === 248 || code === 260) {
-                tips.push('😷 有雾，能见度低，出行注意安全');
-            }
-
-            // 大风天气
-            if (parseInt(currentWeatherData.windSpeed) > 30) {
-                tips.push('💨 风力较大，外出注意安全');
-            }
-
-            // 湿度提示
-            const humidity = parseInt(currentWeatherData.humidity);
-            if (humidity > 80) {
-                tips.push('💧 湿度较高，衣物不易干燥');
-            } else if (humidity < 30) {
-                tips.push('🏜️ 空气干燥，注意补水保湿');
-            }
-
-            if (tips.length === 0) {
-                tips.push('✨ 天气不错，祝你有美好的一天！');
-            }
-            const source = (currentConfig.latitude && currentConfig.longitude) ? '📍 精确定位' : '🌐 基于IP估算';
-            return tips[0] + ' · ' + source;
-        }
-
-        function updateWeatherReminder() {
-            if (!currentWeatherData) return;
-
-            const code = parseInt(currentWeatherData.code);
-            const temp = parseInt(currentWeatherData.temp);
-            const statusEl = document.getElementById('countdown-status');
-
-            // 只在工作时间添加天气提醒
-            const now = new Date();
-            const hours = now.getHours();
-            const day = now.getDay();
-
-            if (day >= 1 && day <= 5 && hours >= 9 && hours < 18) {
-                // 下班时间临近时（17:00后）添加天气提醒
-                if (hours >= 17) {
-                    if (code >= 176 && code < 359) {
-                        statusEl.textContent = '🌂 下班记得带伞！';
-                    } else if (code >= 359) {
-                        statusEl.textContent = '🌨️ 下班注意防滑！';
-                    } else if (temp >= 35) {
-                        statusEl.textContent = '🥵 下班注意防暑！';
-                    } else if (temp <= 5) {
-                        statusEl.textContent = '🧥 下班注意保暖！';
-                    }
-                }
-            }
-        }
-
-        function showWeatherError() {
-            const mainEl = document.getElementById('weather-main');
-            mainEl.innerHTML = `
-                <div style="text-align: center; padding: 20px; color: #718096;">
-                    <div style="font-size: 48px; margin-bottom: 12px;">😢</div>
-                    <div>获取天气失败</div>
-                    <button class="refresh-btn" onclick="refreshWeather()" style="margin-top: 12px;">🔄 重试</button>
-                </div>
-            `;
-        }
-
-        function refreshWeather() {
-            // 清除缓存
-            localStorage.removeItem('weatherCache');
-
-            const mainEl = document.getElementById('weather-main');
-            mainEl.innerHTML = `
-                <div class="weather-loading">
-                    <div class="loading-spinner"></div>
-                    <div>正在获取天气...</div>
-                </div>
-            `;
-
-            // 刷新时重新获取位置
-            getLocation();
-        }
-
-        // ========== 下班倒计时功能 ==========
-        function startWorkCountdown() {
-            updateWorkCountdown();
-            setInterval(updateWorkCountdown, 1000);
-        }
-
-        function updateWorkCountdown() {
-            const now = new Date();
-            const day = now.getDay(); // 0=周日, 1-5=周一到周五, 6=周六
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
-            const seconds = now.getSeconds();
-
-            const card = document.getElementById('work-countdown-card');
-            const title = document.getElementById('countdown-title');
-            const status = document.getElementById('countdown-status');
-            const hoursEl = document.getElementById('hours');
-            const minutesEl = document.getElementById('minutes');
-            const secondsEl = document.getElementById('seconds');
-
-            // 周末
-            if (day === 0 || day === 6) {
-                card.className = 'card work-countdown-card-static weekend';
-                title.textContent = '周末愉快！';
-                hoursEl.textContent = '😊';
-                minutesEl.textContent = '休';
-                secondsEl.textContent = '息';
-                status.textContent = '好好享受周末时光吧！🎉';
-                return;
-            }
-
-            // 工作日
-            const workStart = 9; // 上班时间 9:00
-            const workEnd = 18; // 下班时间 18:00
-
-            // 还没上班
-            if (hours < workStart) {
-                card.className = 'card work-countdown-card-static';
-                title.textContent = '距离上班还有';
-
-                const targetTime = new Date(now);
-                targetTime.setHours(workStart, 0, 0, 0);
-                const diff = Math.floor((targetTime - now) / 1000);
-
-                const h = Math.floor(diff / 3600);
-                const m = Math.floor((diff % 3600) / 60);
-                const s = diff % 60;
-
-                hoursEl.textContent = String(h).padStart(2, '0');
-                minutesEl.textContent = String(m).padStart(2, '0');
-                secondsEl.textContent = String(s).padStart(2, '0');
-                status.textContent = '再睡一会儿吧~ 😴';
-            }
-            // 工作时间
-            else if (hours < workEnd || (hours === workEnd && minutes === 0 && seconds === 0)) {
-                card.className = 'card work-countdown-card-static';
-                title.textContent = '距离下班还有';
-
-                const targetTime = new Date(now);
-                targetTime.setHours(workEnd, 0, 0, 0);
-                const diff = Math.floor((targetTime - now) / 1000);
-
-                const h = Math.floor(diff / 3600);
-                const m = Math.floor((diff % 3600) / 60);
-                const s = diff % 60;
-
-                hoursEl.textContent = String(h).padStart(2, '0');
-                minutesEl.textContent = String(m).padStart(2, '0');
-                secondsEl.textContent = String(s).padStart(2, '0');
-
-                // 根据剩余时间显示不同的鼓励语
-                if (h >= 6) {
-                    status.textContent = '加油！新的一天开始了 💪';
-                } else if (h >= 3) {
-                    status.textContent = '继续努力！已经过半了 🔥';
-                } else if (h >= 1) {
-                    status.textContent = '坚持住！马上就要下班了 ⏰';
-                } else if (m >= 30) {
-                    status.textContent = '最后冲刺！还有不到一小时 🚀';
-                } else if (m >= 10) {
-                    status.textContent = '胜利在望！再坚持一下 🎯';
-                } else {
-                    status.textContent = '倒计时！准备下班啦 🎉';
-                }
-            }
-            // 已经下班
-            else {
-                card.className = 'card work-countdown-card-static off-work';
-                title.textContent = '已经下班啦！';
-                hoursEl.textContent = '🎉';
-                minutesEl.textContent = '下';
-                secondsEl.textContent = '班';
-                status.textContent = '辛苦了！好好休息吧~ 😊';
-            }
-        }
-
-        // 联系方式显示功能
-        function revealContact(element, href, contactValue) {
-            if (element.classList.contains('revealed')) {
-                // 第二次点击，直接跳转
-                window.location.href = href;
-                return;
-            }
-
-            // 第一次点击，显示联系方式
-            const valueElement = element.querySelector('.contact-value');
-            valueElement.textContent = contactValue;
-            valueElement.classList.remove('hidden');
-            element.classList.add('revealed');
-
-            // 更新提示文本
-            if (href.startsWith('tel:')) {
-                valueElement.textContent = contactValue + ' (再次点击拨打)';
-            } else if (href.startsWith('mailto:')) {
-                valueElement.textContent = contactValue + ' (再次点击发邮件)';
-            } else if (href.startsWith('sms:')) {
-                valueElement.textContent = contactValue + ' (再次点击发短信)';
-            }
-
-            // 保存已显示状态
-            const contactType = href.split(':')[0];
-            localStorage.setItem(`contact-revealed-${contactType}`, 'true');
-
-            element.onclick = null;
-            const link = document.createElement('a');
-            link.href = href;
-            link.className = element.className;
-            link.innerHTML = element.innerHTML;
-            element.parentNode.replaceChild(link, element);
-        }
-
-        // 恢复联系方式显示状态
-        function restoreContactStates() {
-            const contacts = [
-                { type: 'tel', selector: '[href^="tel:"]' },
-                { type: 'mailto', selector: '[href^="mailto:"]' },
-                { type: 'sms', selector: '[href^="sms:"]' }
-            ];
-
-            contacts.forEach(contact => {
-                if (localStorage.getItem(`contact-revealed-${contact.type}`) === 'true') {
-                    const element = document.querySelector(contact.selector);
-                    if (element && !element.classList.contains('revealed')) {
-                        element.classList.add('revealed');
-                        const valueElement = element.querySelector('.contact-value');
-                        if (valueElement) {
-                            valueElement.classList.remove('hidden');
-                            // 从href中提取联系方式
-                            const href = element.getAttribute('href') || element.getAttribute('onclick').match(/'([^']+)'/)[1];
-                            const value = href.split(':')[1];
-                            if (contact.type === 'tel' || contact.type === 'sms') {
-                                valueElement.textContent = formatPhone(value);
-                            } else {
-                                valueElement.textContent = value;
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // 主题切换
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const icon = document.getElementById('theme-icon');
-            icon.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        }
-
-        // 加载保存的主题
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('theme-icon').textContent = '☀️';
-            }
+        osPanels.forEach((panel) => {
+          panel.classList.toggle('active', panel.dataset.osPanel === target);
         });
-
-        // 时间显示
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleString('zh-CN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            document.getElementById('current-time').textContent = `🕐 ${timeString}`;
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
-
-        function updateVisitorCount() {
-            const today = new Date().toDateString();
-            const savedDate = localStorage.getItem('visitorDate');
-            let count = localStorage.getItem('visitorCount') || 0;
-            if (savedDate !== today) {
-                count = 0;
-                localStorage.setItem('visitorDate', today);
-            }
-            count = parseInt(count) + 1;
-            localStorage.setItem('visitorCount', count);
-            const vcEl = document.getElementById('visitor-count');
-            if (vcEl) vcEl.textContent = count;
-            const logRaw = localStorage.getItem('visitorLog') || '{}';
-            const log = JSON.parse(logRaw);
-            log[today] = count;
-            const dates = getLastNDates(7);
-            const pruned = {};
-            dates.forEach(d => { pruned[d] = log[d] || 0; });
-            localStorage.setItem('visitorLog', JSON.stringify(pruned));
-            drawVisitorTrend();
-        }
-        updateVisitorCount();
-        
-        function showAICoachmark() {
-            const cm = document.getElementById('ai-coachmark');
-            if (cm) {
-                cm.classList.add('open');
-                positionAICoachmark();
-            }
-        }
-        function dismissAICoachmark() {
-            const cm = document.getElementById('ai-coachmark');
-            if (cm) cm.style.display = 'none';
-            localStorage.setItem('aiCoachDismissed', 'true');
-        }
-        function positionAICoachmark() {
-            const cm = document.getElementById('ai-coachmark');
-            const btn = document.getElementById('ai-chat-btn');
-            if (!cm || !btn) return;
-            const r = btn.getBoundingClientRect();
-            const top = window.scrollY + r.top + r.height / 2 - (cm.offsetHeight || 40) / 2;
-            const left = window.scrollX + r.left - (cm.offsetWidth || 220) - 16;
-            cm.style.top = `${Math.max(8, top)}px`;
-            cm.style.left = `${Math.max(8, left)}px`;
-            cm.style.bottom = '';
-            cm.style.right = '';
-        }
-        function getLastNDates(n) {
-            const arr = [];
-            for (let i = n - 1; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                arr.push(d.toDateString());
-            }
-            return arr;
-        }
-        function drawVisitorTrend() {
-            const canvas = document.getElementById('visitor-trend');
-            if (!canvas) return;
-            const parent = canvas.parentElement;
-            canvas.width = parent.clientWidth;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const dates = getLastNDates(7);
-            const log = JSON.parse(localStorage.getItem('visitorLog') || '{}');
-            const data = dates.map(d => log[d] || 0);
-            const max = Math.max(1, ...data);
-            const stepX = canvas.width / (data.length - 1);
-            const padding = 8;
-            const height = canvas.height - padding * 2;
-            const points = data.map((v, i) => {
-                const x = i * stepX;
-                const y = canvas.height - padding - (v / max) * height;
-                return { x, y };
-            });
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
-            grad.addColorStop(0, '#667eea');
-            grad.addColorStop(1, '#764ba2');
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = grad;
-            ctx.beginPath();
-            points.forEach((p, i) => {
-                if (i === 0) ctx.moveTo(p.x, p.y);
-                else ctx.lineTo(p.x, p.y);
-            });
-            ctx.stroke();
-            ctx.fillStyle = 'rgba(102, 126, 234, 0.15)';
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, canvas.height - padding);
-            points.forEach(p => ctx.lineTo(p.x, p.y));
-            ctx.lineTo(points[points.length - 1].x, canvas.height - padding);
-            ctx.closePath();
-            ctx.fill();
-            ctx.fillStyle = '#667eea';
-            points.forEach(p => {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            const sum = data.reduce((a, b) => a + b, 0);
-            const summary = document.getElementById('trend-summary');
-            if (summary) {
-                summary.textContent = `近7日总计 ${sum} 次 · 今日 ${data[data.length - 1]} 次`;
-            }
-        }
-
-        // ========== 新功能：倒计时 ==========
-        // 计算农历春节日期
-        function getSpringFestivalDate(year) {
-            // 2025-2035年的春节日期（农历正月初一对应的公历日期）
-            const springFestivals = {
-                2025: new Date(2025, 0, 29),  // 2025年1月29日
-                2026: new Date(2026, 1, 17),  // 2026年2月17日
-                2027: new Date(2027, 1, 6),   // 2027年2月6日
-                2028: new Date(2028, 0, 26),  // 2028年1月26日
-                2029: new Date(2029, 1, 13),  // 2029年2月13日
-                2030: new Date(2030, 1, 3),   // 2030年2月3日
-                2031: new Date(2031, 0, 23),  // 2031年1月23日
-                2032: new Date(2032, 1, 11),  // 2032年2月11日
-                2033: new Date(2033, 0, 31),  // 2033年1月31日
-                2034: new Date(2034, 1, 19),  // 2034年2月19日
-                2035: new Date(2035, 1, 8)    // 2035年2月8日
-            };
-            return springFestivals[year];
-        }
-
-        function updateCountdowns() {
-            const now = new Date();
-            const currentYear = now.getFullYear();
-
-            // 计算距离春节的天数
-            let springFestival = getSpringFestivalDate(currentYear);
-            if (!springFestival || now > springFestival) {
-                springFestival = getSpringFestivalDate(currentYear + 1);
-            }
-
-            if (springFestival) {
-                const daysToSpring = Math.ceil((springFestival - now) / (1000 * 60 * 60 * 24));
-                document.getElementById('countdown-spring').textContent = `${daysToSpring} 天`;
-            } else {
-                document.getElementById('countdown-spring').textContent = '计算中...';
-            }
-
-            // 计算距离生日的天数
-            const birthday = new Date(currentConfig.birthday || '2000-01-01');
-            let nextBirthday = new Date(currentYear, birthday.getMonth(), birthday.getDate());
-            if (now > nextBirthday) {
-                nextBirthday = new Date(currentYear + 1, birthday.getMonth(), birthday.getDate());
-            }
-            const daysToBirthday = Math.ceil((nextBirthday - now) / (1000 * 60 * 60 * 24));
-            document.getElementById('countdown-birthday').textContent = `${daysToBirthday} 天`;
-        }
-
-        // 页面加载时更新倒计时
-        updateCountdowns();
-        // 每小时更新一次倒计时
-        setInterval(updateCountdowns, 3600000);
-
-        // 复制到剪贴板
-        function copyToClipboard(text) {
-            // 尝试使用现代API
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showNotification(`✅ 已复制: ${text}`);
-                }).catch(() => {
-                    showNotification(`📋 ${text}`);
-                });
-            } else {
-                // 降级方案
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
-                try {
-                    document.execCommand('copy');
-                    showNotification(`✅ 已复制: ${text}`);
-                } catch (err) {
-                    showNotification(`📋 ${text}`);
-                }
-                document.body.removeChild(textarea);
-            }
-        }
-
-        // 显示通知
-        function showNotification(message) {
-            // 创建通知元素
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(102, 126, 234, 0.95);
-                color: white;
-                padding: 16px 24px;
-                border-radius: 12px;
-                font-size: 14px;
-                font-weight: 600;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-                z-index: 3000;
-                animation: slideDown 0.3s ease-out;
-            `;
-
-            document.body.appendChild(notification);
-
-            // 3秒后移除
-            setTimeout(() => {
-                notification.style.animation = 'slideUp 0.3s ease-out';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
-        // 添加通知动画样式
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideDown {
-                from {
-                    opacity: 0;
-                    transform: translateX(-50%) translateY(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(-50%) translateY(0);
-                }
-            }
-            @keyframes slideUp {
-                from {
-                    opacity: 1;
-                    transform: translateX(-50%) translateY(0);
-                }
-                to {
-                    opacity: 0;
-                    transform: translateX(-50%) translateY(-20px);
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // 页面加载完成后的初始化
-        window.addEventListener('DOMContentLoaded', () => {
-            // 应用保存的配置
-            applyConfig();
-
-            // 恢复联系方式显示状态
-            setTimeout(() => {
-                restoreContactStates();
-            }, 100);
-
-            // 加载保存的主题
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('theme-icon').textContent = '☀️';
-            }
-
-            // 初始化高级交互功能
-            initParticleEffect();
-            init3DCardEffect();
-            initTypingEffect();
-            initKonamiCode();
-            initScrollEffects();
-            initWeatherWidget();
-            initGreeting();
-            initStreak();
-            initStarfield();
-        });
-
-        // ========== 鼠标跟随粒子特效 ==========
-        function initParticleEffect() {
-            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
-            let lastTime = 0;
-
-            document.addEventListener('mousemove', (e) => {
-                const now = Date.now();
-                if (now - lastTime < 50) return; // 限制频率
-                lastTime = now;
-
-                createParticle(e.clientX, e.clientY, colors[Math.floor(Math.random() * colors.length)]);
-            });
-        }
-
-        function createParticle(x, y, color) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            const size = Math.random() * 10 + 5;
-            particle.style.cssText = `
-                left: ${x - size/2}px;
-                top: ${y - size/2}px;
-                width: ${size}px;
-                height: ${size}px;
-                background: ${color};
-                box-shadow: 0 0 ${size}px ${color};
-            `;
-            document.body.appendChild(particle);
-
-            setTimeout(() => {
-                if (particle.parentNode) {
-                    particle.parentNode.removeChild(particle);
-                }
-            }, 1000);
-        }
-
-        // ========== 3D卡片倾斜效果 ==========
-        function init3DCardEffect() {
-            const cards = document.querySelectorAll('.card-3d');
-
-            cards.forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = (y - centerY) / 10;
-                    const rotateY = (centerX - x) / 10;
-
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-                });
-            });
-        }
-
-        // ========== 打字机效果 ==========
-        function initTypingEffect() {
-            const bioElement = document.querySelector('.bio');
-            const originalText = bioElement.textContent;
-
-            // 点击bio触发重新打字
-            bioElement.style.cursor = 'pointer';
-            bioElement.title = '点击重新播放打字效果';
-
-            bioElement.addEventListener('click', () => {
-                typeWriter(bioElement, originalText);
-            });
-        }
-
-        function typeWriter(element, text, speed = 50) {
-            element.textContent = '';
-            const cursor = document.createElement('span');
-            cursor.className = 'typing-cursor';
-            element.appendChild(cursor);
-
-            let i = 0;
-            function type() {
-                if (i < text.length) {
-                    element.insertBefore(document.createTextNode(text.charAt(i)), cursor);
-                    i++;
-                    setTimeout(type, speed);
-                } else {
-                    // 打字完成后移除光标
-                    setTimeout(() => {
-                        if (cursor.parentNode) {
-                            cursor.parentNode.removeChild(cursor);
-                        }
-                    }, 2000);
-                }
-            }
-            type();
-        }
-
-        // ========== Konami Code 秘籍彩蛋 ==========
-        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-        let konamiIndex = 0;
-
-        function initKonamiCode() {
-            document.addEventListener('keydown', (e) => {
-                if (e.key === konamiCode[konamiIndex]) {
-                    konamiIndex++;
-                    if (konamiIndex === konamiCode.length) {
-                        activateKonamiEasterEgg();
-                        konamiIndex = 0;
-                    }
-                } else {
-                    konamiIndex = 0;
-                }
-            });
-        }
-
-        function activateKonamiEasterEgg() {
-            showNotification('🎮 Konami Code 激活！你发现了隐藏彩蛋！');
-
-            // 创建大量烟花
-            for (let i = 0; i < 10; i++) {
-                setTimeout(() => {
-                    const x = Math.random() * window.innerWidth;
-                    const y = Math.random() * window.innerHeight;
-                    createFirework(x, y);
-                }, i * 200);
-            }
-
-            // 页面抖动效果
-            document.body.style.animation = 'shake 0.5s';
-            setTimeout(() => {
-                document.body.style.animation = '';
-            }, 500);
-        }
-
-        // ========== 滚动效果 ==========
-        function initScrollEffects() {
-            const progressBar = document.getElementById('scroll-progress');
-            const backToTop = document.getElementById('back-to-top');
-
-            window.addEventListener('scroll', () => {
-                // 更新进度条
-                const scrollTop = window.scrollY;
-                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-                const progress = (scrollTop / docHeight) * 100;
-                progressBar.style.width = progress + '%';
-
-                // 显示/隐藏返回顶部按钮
-                if (scrollTop > 300) {
-                    backToTop.classList.add('visible');
-                } else {
-                    backToTop.classList.remove('visible');
-                }
-            });
-        }
-
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-
-        // ========== 天气小组件（已移除，使用新的天气卡片） ==========
-        function initWeatherWidget() {
-            // 此功能已由新的天气卡片替代
-        }
-
-        // ========== 时间问候语 ==========
-        function initGreeting() {
-            const hour = new Date().getHours();
-            const greetingEl = document.getElementById('greeting');
-            let greeting, emoji;
-
-            if (hour >= 5 && hour < 9) {
-                greeting = '早上好';
-                emoji = '🌅';
-            } else if (hour >= 9 && hour < 12) {
-                greeting = '上午好';
-                emoji = '☀️';
-            } else if (hour >= 12 && hour < 14) {
-                greeting = '中午好';
-                emoji = '🌞';
-            } else if (hour >= 14 && hour < 18) {
-                greeting = '下午好';
-                emoji = '🌤️';
-            } else if (hour >= 18 && hour < 22) {
-                greeting = '晚上好';
-                emoji = '🌙';
-            } else {
-                greeting = '夜深了';
-                emoji = '🌃';
-            }
-
-            greetingEl.textContent = `${emoji} ${greeting}，欢迎来访！`;
-        }
-
-        // ========== 连续访问天数 ==========
-        function initStreak() {
-            const today = new Date().toDateString();
-            const lastVisit = localStorage.getItem('lastVisitDate');
-            let streak = parseInt(localStorage.getItem('visitStreak')) || 0;
-
-            if (lastVisit) {
-                const lastDate = new Date(lastVisit);
-                const todayDate = new Date(today);
-                const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
-
-                if (diffDays === 0) {
-                    // 今天已经访问过，保持streak不变
-                } else if (diffDays === 1) {
-                    // 连续访问
-                    streak++;
-                    localStorage.setItem('visitStreak', streak);
-
-                    // 检查成就
-                    checkStreakAchievement(streak);
-                } else {
-                    // 断签了，重置
-                    streak = 1;
-                    localStorage.setItem('visitStreak', streak);
-                }
-            } else {
-                // 首次访问
-                streak = 1;
-                localStorage.setItem('visitStreak', streak);
-            }
-
-            localStorage.setItem('lastVisitDate', today);
-            document.getElementById('streak-count').textContent = streak;
-
-            // 点击徽章显示详情
-            document.getElementById('streak-badge').addEventListener('click', () => {
-                showNotification(`🔥 你已连续访问 ${streak} 天！继续保持！`);
-            });
-        }
-
-        function checkStreakAchievement(streak) {
-            const achievements = [
-                { days: 3, icon: '🌟', title: '初露锋芒', desc: '连续访问3天' },
-                { days: 7, icon: '⭐', title: '坚持一周', desc: '连续访问7天' },
-                { days: 14, icon: '🏆', title: '两周达人', desc: '连续访问14天' },
-                { days: 30, icon: '👑', title: '月度冠军', desc: '连续访问30天' },
-                { days: 100, icon: '💎', title: '百日传奇', desc: '连续访问100天' }
-            ];
-
-            const achievement = achievements.find(a => a.days === streak);
-            if (achievement) {
-                showAchievement(achievement.icon, achievement.title, achievement.desc);
-            }
-        }
-
-        function showAchievement(icon, title, desc) {
-            const achievementEl = document.createElement('div');
-            achievementEl.className = 'achievement';
-            achievementEl.innerHTML = `
-                <div class="achievement-icon">${icon}</div>
-                <div class="achievement-title">${title}</div>
-                <div class="achievement-desc">${desc}</div>
-            `;
-            document.body.appendChild(achievementEl);
-
-            // 3秒后移除
-            setTimeout(() => {
-                achievementEl.style.animation = 'achievementPop 0.3s ease-in reverse';
-                setTimeout(() => {
-                    if (achievementEl.parentNode) {
-                        achievementEl.parentNode.removeChild(achievementEl);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        
-
-        // ========== 星空流星特效 ==========
-        let starfieldActive = false;
-        let shootingStarInterval = null;
-
-        function initStarfield() {
-            const starfield = document.getElementById('starfield');
-
-            // 创建星星
-            function createStars() {
-                starfield.innerHTML = '';
-                const starCount = 150;
-                for (let i = 0; i < starCount; i++) {
-                    const star = document.createElement('div');
-                    star.className = 'star';
-                    const size = Math.random() * 3 + 1;
-                    star.style.cssText = `
-                        left: ${Math.random() * 100}%;
-                        top: ${Math.random() * 100}%;
-                        width: ${size}px;
-                        height: ${size}px;
-                        animation-delay: ${Math.random() * 2}s;
-                    `;
-                    starfield.appendChild(star);
-                }
-            }
-
-            // 创建流星
-            function createShootingStar() {
-                const star = document.createElement('div');
-                star.className = 'shooting-star';
-                star.style.cssText = `
-                    left: ${Math.random() * 70}%;
-                    top: ${Math.random() * 50}%;
-                `;
-                starfield.appendChild(star);
-
-                setTimeout(() => {
-                    if (star.parentNode) {
-                        star.parentNode.removeChild(star);
-                    }
-                }, 1000);
-            }
-
-            // 双击页面触发星空效果
-            document.addEventListener('dblclick', (e) => {
-                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
-
-                if (!starfieldActive) {
-                    createStars();
-                    starfield.classList.add('active');
-                    starfieldActive = true;
-                    shootingStarInterval = setInterval(createShootingStar, 2000);
-                    createShootingStar();
-                    showNotification('✨ 星空模式已开启！双击关闭');
-                } else {
-                    starfield.classList.remove('active');
-                    starfieldActive = false;
-                    clearInterval(shootingStarInterval);
-                    starfield.innerHTML = '';
-                    showNotification('✨ 星空模式已关闭');
-                }
-            });
-        }
-
-        // 添加抖动动画样式
-        const shakeStyle = document.createElement('style');
-        shakeStyle.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-                20%, 40%, 60%, 80% { transform: translateX(10px); }
-            }
-        `;
-        document.head.appendChild(shakeStyle);
-
-        // ========== 彩带/纸屑效果 ==========
-        function createConfetti(count = 50) {
-            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3'];
-            const shapes = ['■', '●', '▲', '★', '♦', '♥'];
-
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
-                    confetti.style.cssText = `
-                        left: ${Math.random() * 100}vw;
-                        top: -20px;
-                        color: ${colors[Math.floor(Math.random() * colors.length)]};
-                        font-size: ${Math.random() * 20 + 10}px;
-                        animation-duration: ${Math.random() * 2 + 2}s;
-                    `;
-                    document.body.appendChild(confetti);
-
-                    setTimeout(() => {
-                        if (confetti.parentNode) {
-                            confetti.parentNode.removeChild(confetti);
-                        }
-                    }, 4000);
-                }, i * 30);
-            }
-        }
-        function createConfettiTimed(count = 50, seconds = 2) {
-            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#ffecd2', '#fcb69f', '#a8edea', '#fed6e3'];
-            const shapes = ['■', '●', '▲', '★', '♦', '♥'];
-            const interval = Math.max(10, (seconds * 1000) / Math.max(1, count));
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
-                    confetti.style.cssText = `
-                        left: ${Math.random() * 100}vw;
-                        top: -20px;
-                        color: ${colors[Math.floor(Math.random() * colors.length)]};
-                        font-size: ${Math.random() * 20 + 10}px;
-                        animation-duration: ${Math.random() * 2 + 2}s;
-                    `;
-                    document.body.appendChild(confetti);
-                    setTimeout(() => {
-                        if (confetti.parentNode) {
-                            confetti.parentNode.removeChild(confetti);
-                        }
-                    }, 4000);
-                }, Math.floor(i * interval));
-            }
-        }
-
-        // ========== 页面加载动画 ==========
-        function showPageTransition() {
-            const transition = document.createElement('div');
-            transition.className = 'page-transition';
-            transition.innerHTML = '<div class="loader">⚡</div>';
-            document.body.appendChild(transition);
-
-            setTimeout(() => {
-                if (transition.parentNode) {
-                    transition.parentNode.removeChild(transition);
-                }
-            }, 1000);
-        }
-
-        // ========== 键盘快捷键 ==========
-        function initKeyboardShortcuts() {
-            document.addEventListener('keydown', (e) => {
-                // 按 C 触发彩带
-                if (e.key === 'c' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                    createConfetti(30);
-                    showNotification('🎉 彩带特效！');
-                }
-
-                // 按 H 显示帮助
-                if (e.key === 'h' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                    showNotification('快捷键: C=彩带 | H=帮助 | 双击=星空');
-                }
-            });
-        }
-
-        // ========== 页面可见性变化 ==========
-        function initVisibilityChange() {
-            let leaveTime = 0;
-
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    leaveTime = Date.now();
-                    document.title = '👋 别走啊~ | 我的个人主页';
-                } else {
-                    document.title = '我的个人主页';
-                    const awayTime = Date.now() - leaveTime;
-
-                    if (awayTime > 60000) {
-                        showNotification('🎉 欢迎回来！想你了~');
-                    } else if (awayTime > 10000) {
-                        showNotification('👋 欢迎回来！');
-                    }
-                    createConfettiTimed(50, 2);
-                }
-            });
-        }
-
-        // ========== 初始化所有新功能 ==========
-        window.addEventListener('load', () => {
-            showPageTransition();
-
-            setTimeout(() => {
-                initKeyboardShortcuts();
-                initVisibilityChange();
-            }, 500);
-        });
-
-        // ========== 首次访问欢迎 ==========
-        if (!localStorage.getItem('hasVisited')) {
-            localStorage.setItem('hasVisited', 'true');
-            setTimeout(() => {
-                showNotification('🎉 欢迎首次访问！探索页面发现更多彩蛋~');
-                createConfetti(50);
-            }, 1500);
-        }
-
-        // ========== AI对话功能 ==========
-        let aiChatOpen = false;
-        let aiMessages = [];
-
-        function toggleAIChat() {
-            const chatWindow = document.getElementById('ai-chat-window');
-            aiChatOpen = !aiChatOpen;
-
-            if (aiChatOpen) {
-                chatWindow.classList.add('open');
-                document.getElementById('ai-input').focus();
-                dismissAICoachmark();
-            } else {
-                chatWindow.classList.remove('open');
-            }
-        }
-
-        function handleAIInputKeypress(event) {
-            if (event.key === 'Enter') {
-                sendAIMessage();
-            }
-        }
-
-        async function sendAIMessage() {
-            const input = document.getElementById('ai-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            const messagesContainer = document.getElementById('ai-chat-messages');
-            const sendBtn = document.getElementById('ai-send-btn');
-
-            // 添加用户消息
-            const userMsgEl = document.createElement('div');
-            userMsgEl.className = 'ai-message user';
-            userMsgEl.textContent = message;
-            messagesContainer.appendChild(userMsgEl);
-
-            // 清空输入框
-            input.value = '';
-            sendBtn.disabled = true;
-
-            // 添加加载动画
-            const typingEl = document.createElement('div');
-            typingEl.className = 'ai-message assistant typing';
-            typingEl.innerHTML = '<span></span><span></span><span></span>';
-            messagesContainer.appendChild(typingEl);
-
-            // 滚动到底部
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            // 添加到消息历史
-            aiMessages.push({ role: 'user', content: message });
-
-            try {
-                // 获取API配置
-                const apiUrl = currentConfig.apiUrl || defaultConfig.apiUrl;
-                const apiKey = currentConfig.apiKey || defaultConfig.apiKey;
-                const modelName = currentConfig.aiModelName || defaultConfig.aiModelName;
-                const aiProvider = currentConfig.aiProvider || defaultConfig.aiProvider;
-
-                // 构建基础请求体
-                const requestBody = {
-                    model: modelName,
-                    messages: [
-                        { role: 'system', content: '你是一个友好的AI助手，回答要简洁明了。' },
-                        ...aiMessages
-                    ],
-                    max_tokens: 1000
-                };
-
-                // 根据不同AI提供商添加特定参数
-                if (aiProvider === 'deepseek') {
-                    // DeepSeek 支持 OpenAI 兼容参数
-                    requestBody.temperature = 0.7;
-                } else if (aiProvider === 'claude') {
-                    // Claude API 只使用基础参数，不添加额外参数
-                    requestBody.temperature = 0.7;
-                }
-
-                const response = await fetch(`${apiUrl}/v1/chat/completions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                // 移除加载动画
-                typingEl.remove();
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    const errorEl = document.createElement('div');
-                    errorEl.className = 'ai-message assistant';
-                    errorEl.textContent = '❌ API错误: ' + (errorData.error?.message || `HTTP ${response.status}`);
-                    messagesContainer.appendChild(errorEl);
-                    return;
-                }
-
-                const data = await response.json();
-
-                if (data.choices && data.choices[0]) {
-                    const assistantMessage = data.choices[0].message.content;
-                    aiMessages.push({ role: 'assistant', content: assistantMessage });
-
-                    // 添加AI回复
-                    const aiMsgEl = document.createElement('div');
-                    aiMsgEl.className = 'ai-message assistant';
-                    aiMsgEl.textContent = assistantMessage;
-                    messagesContainer.appendChild(aiMsgEl);
-                } else if (data.error) {
-                    const errorEl = document.createElement('div');
-                    errorEl.className = 'ai-message assistant';
-                    const errorMsg = typeof data.error === 'string' ? data.error : (data.error.message || JSON.stringify(data.error));
-                    errorEl.textContent = '❌ 错误: ' + errorMsg;
-                    messagesContainer.appendChild(errorEl);
-                } else {
-                    const errorEl = document.createElement('div');
-                    errorEl.className = 'ai-message assistant';
-                    errorEl.textContent = '❌ 未知错误: 无法解析响应';
-                    messagesContainer.appendChild(errorEl);
-                }
-            } catch (error) {
-                typingEl.remove();
-                const errorEl = document.createElement('div');
-                errorEl.className = 'ai-message assistant';
-                errorEl.textContent = '❌ 网络错误: ' + (error.message || '请稍后重试');
-                messagesContainer.appendChild(errorEl);
-                console.error('AI Error:', error);
-            }
-
-            sendBtn.disabled = false;
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // 修改saveSettings函数
-        const originalSaveSettings = saveSettings;
-        saveSettings = function() {
-            // 调用原始保存函数的逻辑
-            currentConfig.name = document.getElementById('setting-name').value || 'YJX';
-            currentConfig.bio = document.getElementById('setting-bio').value || '一个热爱编程的开发者';
-            currentConfig.status = document.getElementById('setting-status').value || '可以联系';
-            currentConfig.phone = document.getElementById('setting-phone').value || '18325666364';
-            currentConfig.email = document.getElementById('setting-email').value || 'example@qq.com';
-            currentConfig.github = document.getElementById('setting-github').value || 'https://github.com';
-            currentConfig.wechat = document.getElementById('setting-wechat').value || '微信号';
-            currentConfig.qq = document.getElementById('setting-qq').value || 'QQ号';
-            currentConfig.bilibili = document.getElementById('setting-bilibili').value || 'B站';
-            currentConfig.birthday = document.getElementById('setting-birthday').value || '2000-01-01';
-
-            const skillInputs = document.querySelectorAll('[data-skill-index]');
-            currentConfig.skills = Array.from(skillInputs).map(input => input.value).filter(v => v.trim());
-
-            saveConfig(currentConfig);
-            applyConfig();
-            
-            // 刷新天气 (可能会根据新位置更新，虽然不能手动设置城市了，但为了保持逻辑一致性)
-            initWeather();
-            
-            updateCountdowns();
-            toggleSettings();
-            showNotification('✅ 设置已保存！');
-        };
-
-        // ========== AI设置面板功能 ==========
-        let aiPanelUnlocked = false;
-
-        function openAISettings() {
-            document.getElementById('ai-settings-overlay').classList.add('open');
-            document.getElementById('ai-settings-panel').classList.add('open');
-        }
-
-        function closeAISettings() {
-            document.getElementById('ai-settings-overlay').classList.remove('open');
-            document.getElementById('ai-settings-panel').classList.remove('open');
-        }
-
-        function unlockAIPanel() {
-            const password = prompt('请输入密码：');
-            if (password === '888888') {
-                aiPanelUnlocked = true;
-                document.getElementById('ai-panel-locked').style.display = 'none';
-                document.getElementById('ai-panel-unlocked').style.display = 'block';
-
-                // 加载当前配置
-                document.getElementById('ai-setting-model').value = currentConfig.aiProvider || 'deepseek';
-                document.getElementById('ai-setting-url').value = currentConfig.apiUrl || defaultConfig.apiUrl;
-                document.getElementById('ai-setting-key').value = currentConfig.apiKey || defaultConfig.apiKey;
-                document.getElementById('ai-setting-model-name').value = currentConfig.aiModelName || defaultConfig.aiModelName;
-
-                showNotification('✅ AI配置已解锁');
-            } else if (password !== null) {
-                showNotification('❌ 密码错误');
-            }
-        }
-
-        function onAIModelChange() {
-            const provider = document.getElementById('ai-setting-model').value;
-            const preset = aiProviderPresets[provider];
-            if (preset && provider !== 'custom') {
-                document.getElementById('ai-setting-url').value = preset.url;
-                document.getElementById('ai-setting-model-name').value = preset.model;
-            }
-        }
-
-        function toggleAIKeyVisibility() {
-            const input = document.getElementById('ai-setting-key');
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-
-        function saveAISettings() {
-            const aiProvider = document.getElementById('ai-setting-model').value;
-            const apiUrl = document.getElementById('ai-setting-url').value.trim();
-            const apiKey = document.getElementById('ai-setting-key').value.trim();
-            const aiModelName = document.getElementById('ai-setting-model-name').value.trim();
-
-            currentConfig.aiProvider = aiProvider;
-            if (apiUrl) currentConfig.apiUrl = apiUrl;
-            if (apiKey) currentConfig.apiKey = apiKey;
-            if (aiModelName) currentConfig.aiModelName = aiModelName;
-
-            saveConfig(currentConfig);
-            closeAISettings();
-            showNotification('✅ AI配置已保存！');
-        }
-
-        function resetAISettings() {
-            if (confirm('确定要恢复默认API配置吗？')) {
-                currentConfig.aiProvider = defaultConfig.aiProvider;
-                currentConfig.apiUrl = defaultConfig.apiUrl;
-                currentConfig.apiKey = defaultConfig.apiKey;
-                currentConfig.aiModelName = defaultConfig.aiModelName;
-                saveConfig(currentConfig);
-
-                document.getElementById('ai-setting-model').value = defaultConfig.aiProvider;
-                document.getElementById('ai-setting-url').value = defaultConfig.apiUrl;
-                document.getElementById('ai-setting-key').value = defaultConfig.apiKey;
-                document.getElementById('ai-setting-model-name').value = defaultConfig.aiModelName;
-
-                showNotification('✅ 已恢复默认API配置');
-            }
-        }
-    </script>
+      });
+    });
+
+    const navLinks = document.querySelectorAll('.nav a');
+    const sections = Array.from(document.querySelectorAll('section[id]'));
+
+    const updateActiveNav = () => {
+      const offset = window.scrollY + 140;
+      let currentId = sections[0]?.id || '';
+      sections.forEach((section) => {
+        if (offset >= section.offsetTop) currentId = section.id;
+      });
+      navLinks.forEach((link) => {
+        const active = link.getAttribute('href') === `#${currentId}`;
+        link.classList.toggle('active', active);
+      });
+    };
+
+    updateActiveNav();
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+  </script>
 </body>
 </html>
