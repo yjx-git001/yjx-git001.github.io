@@ -3,39 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Codex 高级文档站</title>
-  <meta name="description" content="OpenAI Codex 安装、认证、配置、模型切换、VS Code 与 CCSwitch 接入的高级文档展示页。">
+  <title>Claude Code / Codex CLI 安装使用</title>
+  <meta name="description" content="Claude Code 与 Codex CLI 的 macOS/Linux、Windows 安装使用流程，接入示意与 CCSwitch 配置。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #050816;
-      --bg-soft: #0a1022;
-      --panel: rgba(10, 16, 34, 0.76);
-      --panel-strong: rgba(9, 14, 29, 0.92);
-      --panel-light: rgba(255, 255, 255, 0.04);
-      --card: rgba(255, 255, 255, 0.05);
-      --card-strong: rgba(255, 255, 255, 0.08);
-      --line: rgba(255, 255, 255, 0.08);
-      --line-strong: rgba(255, 255, 255, 0.14);
-      --text: #f5f7ff;
-      --text-soft: rgba(245, 247, 255, 0.72);
-      --text-faint: rgba(245, 247, 255, 0.48);
-      --primary: #7c88ff;
-      --primary-2: #4fd1ff;
-      --primary-3: #c478ff;
-      --success: #59f1c0;
-      --warning: #ffb86b;
-      --shadow-xl: 0 32px 120px rgba(0, 0, 0, 0.45);
-      --shadow-md: 0 18px 60px rgba(0, 0, 0, 0.28);
-      --radius-xl: 32px;
+      color-scheme: light;
+      --bg: #f5efe1;
+      --paper: rgba(255, 250, 242, 0.8);
+      --paper-strong: #fffaf3;
+      --paper-soft: rgba(255, 255, 255, 0.58);
+      --ink: #17252d;
+      --ink-soft: rgba(23, 37, 45, 0.74);
+      --ink-faint: rgba(23, 37, 45, 0.46);
+      --line: rgba(23, 37, 45, 0.12);
+      --line-strong: rgba(23, 37, 45, 0.22);
+      --teal: #0f766e;
+      --amber: #b8642a;
+      --coral: #cf5f4a;
+      --sky: #7fc6c8;
+      --shadow-xl: 0 34px 90px rgba(38, 49, 55, 0.12);
+      --shadow-md: 0 18px 45px rgba(38, 49, 55, 0.08);
+      --radius-xl: 34px;
       --radius-lg: 24px;
       --radius-md: 18px;
       --radius-sm: 14px;
-      --container: min(1320px, calc(100% - 48px));
-      --nav-h: 82px;
+      --container: min(1180px, calc(100% - 32px));
+      --nav-h: 78px;
     }
 
     * { box-sizing: border-box; }
@@ -45,13 +41,12 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 12% 18%, rgba(124, 136, 255, 0.24), transparent 26%),
-        radial-gradient(circle at 88% 10%, rgba(79, 209, 255, 0.18), transparent 20%),
-        radial-gradient(circle at 50% 78%, rgba(196, 120, 255, 0.14), transparent 22%),
-        linear-gradient(180deg, #070b17 0%, #04070f 100%);
-      color: var(--text);
-      font-family: "Geist", "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-feature-settings: "liga" 1;
+        radial-gradient(circle at 10% 10%, rgba(127, 198, 200, 0.28), transparent 26%),
+        radial-gradient(circle at 90% 12%, rgba(184, 100, 42, 0.16), transparent 22%),
+        radial-gradient(circle at 50% 88%, rgba(207, 95, 74, 0.12), transparent 18%),
+        linear-gradient(180deg, #f7f1e4 0%, #f1e8d7 52%, #efe6d6 100%);
+      color: var(--ink);
+      font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
       overflow-x: hidden;
     }
 
@@ -60,19 +55,48 @@
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-      background-size: 36px 36px;
-      mask-image: linear-gradient(180deg, rgba(0,0,0,0.55), transparent 84%);
+        linear-gradient(rgba(23, 37, 45, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 37, 45, 0.06) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 76%);
       pointer-events: none;
-      opacity: 0.35;
+      opacity: 0.48;
     }
 
     a { color: inherit; text-decoration: none; }
-    button, input, textarea { font: inherit; }
+    button { font: inherit; }
+    code, pre { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-    code, pre {
-      font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    .orb {
+      position: fixed;
+      border-radius: 999px;
+      filter: blur(20px);
+      pointer-events: none;
+      opacity: 0.7;
+      z-index: 0;
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+
+    .orb-left {
+      width: 280px;
+      height: 280px;
+      top: 84px;
+      left: -80px;
+      background: rgba(127, 198, 200, 0.28);
+    }
+
+    .orb-right {
+      width: 320px;
+      height: 320px;
+      top: 420px;
+      right: -100px;
+      background: rgba(184, 100, 42, 0.18);
+      animation-delay: 1.4s;
+    }
+
+    @keyframes drift {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(0, 28px, 0) scale(1.04); }
     }
 
     .shell {
@@ -87,9 +111,9 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      backdrop-filter: blur(22px);
-      background: rgba(4, 7, 15, 0.62);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px);
+      background: rgba(247, 241, 228, 0.78);
+      border-bottom: 1px solid rgba(23, 37, 45, 0.08);
     }
 
     .topbar-inner {
@@ -99,7 +123,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 24px;
+      gap: 20px;
     }
 
     .brand {
@@ -115,12 +139,11 @@
       border-radius: 14px;
       display: grid;
       place-items: center;
-      color: white;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: -0.04em;
-      background:
-        linear-gradient(135deg, rgba(124,136,255,1), rgba(79,209,255,0.95) 60%, rgba(196,120,255,0.95));
-      box-shadow: 0 14px 40px rgba(95, 117, 255, 0.32);
+      color: white;
+      background: linear-gradient(135deg, var(--teal), #0f4a62 60%, var(--amber));
+      box-shadow: 0 16px 32px rgba(15, 118, 110, 0.26);
     }
 
     .brand-copy {
@@ -134,7 +157,7 @@
     }
 
     .brand-copy span {
-      color: var(--text-faint);
+      color: var(--ink-faint);
       font-size: 12px;
     }
 
@@ -143,437 +166,458 @@
       align-items: center;
       flex-wrap: wrap;
       justify-content: flex-end;
-      gap: 10px;
+      gap: 8px;
     }
 
     .nav a {
       padding: 10px 14px;
       border-radius: 999px;
-      color: var(--text-soft);
+      color: var(--ink-soft);
       font-size: 14px;
-      transition: 0.25s ease;
+      transition: 0.22s ease;
     }
 
     .nav a:hover,
     .nav a.active {
-      color: var(--text);
-      background: rgba(255,255,255,0.06);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: inset 0 0 0 1px rgba(23, 37, 45, 0.08);
     }
 
     .hero {
+      padding: 38px 0 18px;
+    }
+
+    .hero-panel,
+    .section,
+    .footer-card {
       position: relative;
-      padding: 56px 0 28px;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(23, 37, 45, 0.1);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.36)),
+        var(--paper);
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(18px);
     }
 
     .hero-panel {
-      position: relative;
-      overflow: hidden;
-      border-radius: 40px;
-      padding: 38px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)),
-        linear-gradient(135deg, rgba(17,25,52,0.92), rgba(8,12,26,0.96));
-      border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: var(--shadow-xl);
-      isolation: isolate;
+      padding: 34px;
     }
 
     .hero-panel::before,
-    .hero-panel::after {
+    .section::before,
+    .footer-card::before {
       content: "";
       position: absolute;
-      border-radius: 999px;
-      filter: blur(10px);
-      opacity: 0.7;
-      z-index: -1;
-    }
-
-    .hero-panel::before {
-      width: 360px;
-      height: 360px;
-      right: -90px;
-      top: -110px;
-      background: radial-gradient(circle, rgba(124,136,255,0.34), transparent 70%);
-    }
-
-    .hero-panel::after {
-      width: 280px;
-      height: 280px;
-      left: -40px;
-      bottom: -120px;
-      background: radial-gradient(circle, rgba(79,209,255,0.18), transparent 72%);
+      inset: 0 0 auto 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(23, 37, 45, 0.22), transparent 70%);
+      pointer-events: none;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
-      gap: 26px;
+      grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+      gap: 24px;
       align-items: stretch;
     }
 
     .eyebrow,
-    .tiny-label {
+    .section-kicker,
+    .tiny-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 14px;
       width: fit-content;
+      padding: 8px 14px;
       border-radius: 999px;
-      color: #d7dcff;
-      background: rgba(255,255,255,0.06);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-      font-size: 12px;
-      letter-spacing: 0.08em;
+      border: 1px solid rgba(23, 37, 45, 0.1);
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--ink-soft);
       text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
     }
 
-    .eyebrow::before {
+    .eyebrow::before,
+    .section-kicker::before {
       content: "";
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--success), var(--primary-2));
-      box-shadow: 0 0 18px rgba(89, 241, 192, 0.9);
+      background: linear-gradient(135deg, var(--teal), var(--amber));
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.09);
     }
 
     .hero-copy {
       display: grid;
       align-content: start;
-      gap: 22px;
-      padding-right: 10px;
+      gap: 20px;
     }
 
-    .hero h1 {
+    .hero-copy h1 {
       margin: 0;
-      font-size: clamp(44px, 6vw, 84px);
+      max-width: 11ch;
+      font-size: clamp(46px, 6.8vw, 84px);
       line-height: 0.95;
-      letter-spacing: -0.07em;
-      max-width: 10ch;
+      letter-spacing: -0.08em;
     }
 
-    .hero .lede {
+    .hero-copy p {
       margin: 0;
       max-width: 760px;
-      color: var(--text-soft);
-      font-size: clamp(17px, 2vw, 20px);
-      line-height: 1.8;
+      color: var(--ink-soft);
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 1.82;
     }
 
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 14px;
+      gap: 12px;
     }
 
     .btn {
       appearance: none;
-      border: 0;
-      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
       padding: 14px 18px;
-      border-radius: 16px;
+      border-radius: 18px;
+      border: 0;
+      cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: -0.02em;
     }
 
     .btn:hover { transform: translateY(-1px); }
 
     .btn-primary {
-      color: #08101f;
-      background: linear-gradient(135deg, #dfe4ff, #8fe1ff);
-      box-shadow: 0 18px 40px rgba(79, 209, 255, 0.2);
+      color: white;
+      background: linear-gradient(135deg, var(--teal), #155a6f);
+      box-shadow: 0 18px 38px rgba(15, 118, 110, 0.22);
     }
 
-    .btn-ghost {
-      color: var(--text);
-      background: rgba(255,255,255,0.05);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    .btn-secondary {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: inset 0 0 0 1px rgba(23, 37, 45, 0.1);
     }
 
-    .hero-metrics {
+    .hero-strip {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 12px;
-      margin-top: 6px;
     }
 
-    .metric {
+    .strip-card {
       padding: 16px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid rgba(23, 37, 45, 0.08);
     }
 
-    .metric strong {
+    .strip-card strong {
       display: block;
+      margin-bottom: 6px;
       font-size: 24px;
       letter-spacing: -0.05em;
-      margin-bottom: 6px;
     }
 
-    .metric span {
-      color: var(--text-faint);
+    .strip-card span {
+      color: var(--ink-faint);
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
-    .hero-aside {
+    .hero-side {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-note,
+    .summary-card,
+    .compare-card,
+    .matrix,
+    .journey-card,
+    .feature-card,
+    .decision-card,
+    .source-card,
+    .footer-card,
+    .insight {
+      border: 1px solid rgba(23, 37, 45, 0.09);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.54)),
+        var(--paper-soft);
+      box-shadow: var(--shadow-md);
+    }
+    .hero-note,
+    .summary-card,
+    .compare-card,
+    .journey-card,
+    .feature-card,
+    .decision-card,
+    .source-card,
+    .insight {
+      border-radius: 24px;
+      padding: 22px;
+    }
+
+    .hero-note h2,
+    .summary-card h3,
+    .compare-card h3,
+    .journey-card h3,
+    .feature-card h3,
+    .decision-card h3,
+    .source-card h3,
+    .insight h3,
+    .matrix-card h3 {
+      margin: 0 0 10px;
+      letter-spacing: -0.05em;
+    }
+
+    .hero-note p,
+    .summary-card p,
+    .compare-card p,
+    .journey-card p,
+    .feature-card p,
+    .decision-card p,
+    .source-card p,
+    .insight p,
+    .matrix-card p,
+    .matrix-cell,
+    .bullet-list,
+    .code-note,
+    .footer-card p {
+      color: var(--ink-soft);
+      line-height: 1.8;
+    }
+
+    .bullet-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .bullet-list li + li { margin-top: 8px; }
+
+    .hero-note-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero-note-grid .tiny-pill {
+      margin-bottom: 4px;
+    }
+
+    .editor-note {
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(184, 100, 42, 0.1));
+      border: 1px solid rgba(15, 118, 110, 0.16);
+      color: var(--ink-soft);
+      line-height: 1.8;
+    }
+
+    .main {
+      display: grid;
+      gap: 22px;
+      margin-top: 24px;
+    }
+
+    .section {
+      padding: 30px;
+      scroll-margin-top: calc(var(--nav-h) + 18px);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      max-width: 12ch;
+      font-size: clamp(30px, 4.8vw, 54px);
+      line-height: 0.98;
+      letter-spacing: -0.08em;
+    }
+
+    .section-head p {
+      margin: 10px 0 0;
+      max-width: 760px;
+      color: var(--ink-soft);
+      line-height: 1.86;
+    }
+
+    .summary-grid,
+    .journey-grid,
+    .feature-grid,
+    .decision-grid,
+    .source-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .summary-grid { grid-template-columns: 1.15fr 0.85fr 0.85fr; }
+    .journey-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .decision-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .source-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .summary-card--shared {
+      background:
+        linear-gradient(135deg, rgba(15, 118, 110, 0.16), rgba(255, 255, 255, 0.54)),
+        var(--paper-soft);
+    }
+
+    .summary-card--codex::after,
+    .summary-card--claude::after {
+      content: "";
+      position: absolute;
+      inset: auto 22px 22px auto;
+      width: 78px;
+      height: 78px;
+      border-radius: 18px;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    .summary-card--codex { position: relative; }
+    .summary-card--codex::after { background: linear-gradient(135deg, var(--teal), #155a6f); }
+    .summary-card--claude { position: relative; }
+    .summary-card--claude::after { background: linear-gradient(135deg, var(--amber), var(--coral)); }
+
+    .summary-card .meta {
+      display: inline-flex;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink-faint);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .matrix {
+      border-radius: 28px;
+      overflow: hidden;
+    }
+
+    .matrix-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 1fr;
+      border-top: 1px solid rgba(23, 37, 45, 0.08);
+    }
+
+    .matrix-row:first-child { border-top: 0; }
+
+    .matrix-label,
+    .matrix-cell {
+      padding: 18px 20px;
+      min-height: 100%;
+    }
+
+    .matrix-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      background: rgba(255, 255, 255, 0.76);
+    }
+
+    .matrix-cell + .matrix-cell {
+      border-left: 1px solid rgba(23, 37, 45, 0.08);
+    }
+
+    .matrix-head {
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .insight {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .journey-card {
       display: grid;
       gap: 18px;
       align-content: start;
     }
 
-    .hero-card,
-    .section,
-    .spotlight,
-    .footer-card {
-      border: 1px solid rgba(255,255,255,0.08);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025)),
-        rgba(6, 10, 22, 0.88);
-      box-shadow: var(--shadow-md);
-      backdrop-filter: blur(18px);
-    }
-
-    .hero-card {
-      padding: 22px;
-      border-radius: 28px;
-    }
-
-    .hero-card h2,
-    .section h2,
-    .section h3,
-    .card h3,
-    .stack-card h3,
-    .resource-card h3,
-    .mock h3,
-    .terminal-card h3 {
-      letter-spacing: -0.05em;
-    }
-
-    .hero-card h2 {
-      margin: 0 0 8px;
-      font-size: 24px;
-    }
-
-    .hero-card p {
-      margin: 0;
-      color: var(--text-soft);
-      line-height: 1.8;
-    }
-
-    .command-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .command-pill {
+    .journey-card header {
       display: flex;
+      align-items: flex-start;
       justify-content: space-between;
-      align-items: center;
       gap: 16px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      color: var(--text-soft);
-      font-size: 13px;
-    }
-
-    .command-pill code {
-      color: white;
-      font-size: 13px;
-    }
-
-    .spotlight {
-      margin-top: 24px;
-      border-radius: 28px;
-      padding: 18px 22px;
-      display: grid;
-      grid-template-columns: 160px minmax(0, 1fr);
-      gap: 20px;
-      align-items: center;
-    }
-
-    .spotlight-label {
-      display: grid;
-      gap: 4px;
-    }
-
-    .spotlight-label strong {
-      font-size: 13px;
-      color: var(--text-faint);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .spotlight-label span {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.05em;
-    }
-
-    .spotlight-items {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .spotlight-item {
-      padding: 16px 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .spotlight-item strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 15px;
-    }
-
-    .spotlight-item p {
-      margin: 0;
-      color: var(--text-soft);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .main {
-      display: grid;
-      gap: 24px;
-      margin-top: 26px;
-    }
-
-    .section {
-      border-radius: 30px;
-      padding: 30px;
-      scroll-margin-top: calc(var(--nav-h) + 16px);
-    }
-
-    .section-head {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 18px;
       flex-wrap: wrap;
-      margin-bottom: 22px;
     }
 
-    .section h2 {
-      margin: 0;
-      font-size: clamp(30px, 4vw, 48px);
-      line-height: 1.02;
-    }
-
-    .section-intro {
-      margin: 8px 0 0;
-      max-width: 820px;
-      color: var(--text-soft);
-      line-height: 1.9;
-    }
-
-    .grid-2,
-    .grid-3,
-    .grid-4 {
-      display: grid;
-      gap: 18px;
-    }
-
-    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-
-    .card,
-    .stack-card,
-    .resource-card,
-    .mock,
-    .terminal-card,
-    .timeline-card {
-      position: relative;
-      padding: 22px;
-      border-radius: 24px;
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden;
-    }
-
-    .card::before,
-    .stack-card::before,
-    .resource-card::before,
-    .mock::before,
-    .terminal-card::before,
-    .timeline-card::before {
-      content: "";
-      position: absolute;
-      inset: 0 auto auto 0;
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.22), transparent 70%);
-      pointer-events: none;
-    }
-
-    .card h3,
-    .stack-card h3,
-    .resource-card h3,
-    .mock h3,
-    .terminal-card h3,
-    .timeline-card h3 {
-      margin: 0 0 10px;
-      font-size: 22px;
-    }
-
-    .card p,
-    .stack-card p,
-    .resource-card p,
-    .mock p,
-    .terminal-card p,
-    .timeline-card p,
-    .list,
-    .field-label,
-    .tiny-note,
-    footer {
-      color: var(--text-soft);
-      line-height: 1.8;
-    }
-
-    .list {
-      margin: 0;
-      padding-left: 18px;
-    }
-
-    .timeline {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .timeline-card .step {
+    .badge {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      margin-bottom: 14px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(124,136,255,0.24), rgba(79,209,255,0.18));
-      color: white;
-      font-weight: 700;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink-faint);
     }
 
-    .code-window,
-    .terminal-window {
+    .steps {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .step-index {
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      background: linear-gradient(135deg, rgba(15, 118, 110, 0.18), rgba(184, 100, 42, 0.14));
+      color: var(--ink);
+    }
+
+    .step-copy strong {
+      display: block;
+      margin-bottom: 4px;
+      letter-spacing: -0.03em;
+    }
+
+    .code-window {
       overflow: hidden;
-      border-radius: 24px;
-      background: linear-gradient(180deg, #0b1225, #070b15);
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+      border-radius: 22px;
+      background: linear-gradient(180deg, #182831, #132029);
+      color: #eff7f7;
+      border: 1px solid rgba(23, 37, 45, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
     .window-head {
@@ -581,12 +625,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      color: rgba(245,247,255,0.62);
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(239, 247, 247, 0.72);
       font-size: 12px;
-      letter-spacing: 0.08em;
       text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
 
     .window-dots {
@@ -600,153 +644,106 @@
       border-radius: 50%;
     }
 
-    .window-dots span:nth-child(1) { background: #ff6b6b; }
-    .window-dots span:nth-child(2) { background: #ffd166; }
-    .window-dots span:nth-child(3) { background: #4ce5b1; }
+    .window-dots span:nth-child(1) { background: #ff7f7f; }
+    .window-dots span:nth-child(2) { background: #ffc861; }
+    .window-dots span:nth-child(3) { background: #61d9b8; }
+
+    .copy-btn {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      transition: 0.2s ease;
+    }
+
+    .copy-btn:hover { background: rgba(255, 255, 255, 0.14); }
 
     pre {
       margin: 0;
       padding: 18px;
       font-size: 13px;
-      line-height: 1.85;
+      line-height: 1.9;
       white-space: pre-wrap;
       word-break: break-word;
-      color: #edf3ff;
     }
 
-    .copy-btn {
-      appearance: none;
-      border: 0;
-      cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.07);
-      color: #edf3ff;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-      font-size: 12px;
-      transition: 0.2s ease;
-    }
-
-    .copy-btn:hover { background: rgba(255,255,255,0.12); }
-
-    .config-stack,
-    .resource-list,
-    .ccswitch-stack {
+    .feature-card {
       display: grid;
-      gap: 18px;
+      gap: 14px;
+      align-content: start;
     }
 
-    .config-note,
-    .callout,
-    .sidebar-note,
-    .promo-note {
+    .feature-card .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--ink-faint);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(23, 37, 45, 0.08);
+    }
+
+    .callout {
       padding: 16px 18px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(124,136,255,0.12), rgba(79,209,255,0.08));
-      border: 1px solid rgba(124,136,255,0.18);
-      color: var(--text-soft);
+      background: linear-gradient(135deg, rgba(184, 100, 42, 0.11), rgba(255, 255, 255, 0.5));
+      border: 1px solid rgba(184, 100, 42, 0.16);
+      color: var(--ink-soft);
       line-height: 1.8;
     }
 
-    .field-grid {
+    .decision-card {
       display: grid;
-      gap: 14px;
-      margin-top: 16px;
+      gap: 12px;
+      align-content: start;
     }
 
-    .field {
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .field-label {
+    .decision-card strong {
       display: block;
-      margin-bottom: 8px;
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-faint);
+      font-size: 20px;
+      letter-spacing: -0.05em;
     }
 
-    .field-value {
-      font-family: "Geist Mono", monospace;
-      color: white;
-      word-break: break-all;
-    }
-
-    .tabs {
-      display: inline-flex;
-      gap: 10px;
-      padding: 8px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.08);
-      margin-bottom: 18px;
-    }
-
-    .tabs button {
-      appearance: none;
-      border: 0;
-      background: transparent;
-      color: var(--text-soft);
-      border-radius: 14px;
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .tabs button.active {
-      color: #08101f;
-      background: linear-gradient(135deg, #dfe4ff, #8fe1ff);
-      box-shadow: 0 10px 28px rgba(79, 209, 255, 0.22);
-    }
-
-    .ccswitch-panel { display: none; }
-    .ccswitch-panel.active { display: block; }
-
-    .path {
-      margin-bottom: 10px;
-      color: var(--text-faint);
-      font-family: "Geist Mono", monospace;
-      font-size: 13px;
-    }
-
-    .resource-list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .resource-card {
+    .source-card {
       display: grid;
       gap: 12px;
       transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
 
-    .resource-card:hover {
+    .source-card:hover {
       transform: translateY(-2px);
-      border-color: rgba(124,136,255,0.22);
-      background: rgba(255,255,255,0.06);
+      border-color: rgba(15, 118, 110, 0.22);
+      background: rgba(255, 255, 255, 0.78);
     }
 
-    .resource-meta {
+    .source-card .meta {
       display: inline-flex;
       width: fit-content;
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      color: var(--text-faint);
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink-faint);
       font-size: 12px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
     .footer-card {
-      margin-top: 24px;
-      border-radius: 28px;
-      padding: 24px;
+      margin-top: 22px;
+      padding: 24px 28px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: 1fr auto;
       gap: 18px;
       align-items: center;
     }
@@ -754,45 +751,1092 @@
     .footer-card strong {
       display: block;
       margin-bottom: 8px;
-      font-size: 22px;
+      font-size: 24px;
+      letter-spacing: -0.06em;
+    }
+
+    .footer-card small {
+      display: block;
+      color: var(--ink-faint);
+      line-height: 1.7;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      transition-delay: var(--delay, 0ms);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Editorial reframe */
+    body {
+      background:
+        radial-gradient(circle at 14% 12%, rgba(177, 149, 95, 0.16), transparent 22%),
+        radial-gradient(circle at 82% 14%, rgba(28, 69, 64, 0.16), transparent 20%),
+        linear-gradient(180deg, #f5efe6 0%, #ede4d7 48%, #e8ded1 100%);
+      font-family: "Manrope", "Noto Sans SC", sans-serif;
+    }
+
+    body::before {
+      background-image:
+        linear-gradient(rgba(28, 27, 24, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(28, 27, 24, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.28;
+    }
+
+    .topbar {
+      background: rgba(245, 239, 230, 0.72);
+      border-bottom: 1px solid rgba(25, 27, 28, 0.08);
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #163632, #1f4741 58%, #9a7b4a);
+      box-shadow: 0 18px 36px rgba(22, 54, 50, 0.2);
+    }
+
+    .brand-copy strong {
+      font-family: "Cormorant Garamond", "Noto Serif SC", serif;
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-copy span {
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .hero-panel,
+    .section,
+    .footer-card {
+      background:
+        linear-gradient(180deg, rgba(255, 251, 246, 0.82), rgba(246, 238, 228, 0.94)),
+        rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(27, 30, 32, 0.09);
+      box-shadow: 0 34px 84px rgba(40, 41, 38, 0.1);
+    }
+
+    .hero-panel {
+      padding: 46px 44px;
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      right: -110px;
+      top: -140px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(154, 123, 74, 0.18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.82fr);
+      gap: 34px;
+    }
+
+    .eyebrow,
+    .section-kicker,
+    .tiny-pill,
+    .badge,
+    .summary-card .meta,
+    .source-card .meta {
+      background: rgba(255, 255, 255, 0.62);
+      border-color: rgba(20, 27, 29, 0.09);
+      color: rgba(22, 31, 34, 0.72);
+    }
+
+    .hero-copy h1,
+    .section-head h2,
+    .hero-note h2,
+    .summary-card h3,
+    .journey-card h3,
+    .feature-card h3,
+    .decision-card strong,
+    .source-card h3,
+    .insight h3,
+    .footer-card strong {
+      font-family: "Cormorant Garamond", "Noto Serif SC", serif;
+      font-weight: 600;
+      letter-spacing: -0.045em;
+    }
+
+    .hero-copy h1 {
+      max-width: 10ch;
+      font-size: clamp(56px, 7.4vw, 96px);
+      line-height: 0.9;
+    }
+
+    .hero-copy p,
+    .section-head p,
+    .hero-note p,
+    .summary-card p,
+    .journey-card p,
+    .feature-card p,
+    .decision-card p,
+    .source-card p,
+    .insight p,
+    .code-note {
+      color: rgba(26, 35, 39, 0.78);
+    }
+
+    .hero-actions {
+      padding-top: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #143833, #1d4741 55%, #7f6640);
+      box-shadow: 0 20px 40px rgba(20, 56, 51, 0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.56);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-strip {
+      padding-top: 18px;
+      border-top: 1px solid rgba(20, 27, 29, 0.08);
+    }
+
+    .strip-card {
+      background: transparent;
+      border: 0;
+      border-left: 1px solid rgba(20, 27, 29, 0.09);
+      border-radius: 0;
+      padding: 2px 0 2px 16px;
+    }
+
+    .strip-card strong {
+      font-family: "Cormorant Garamond", "Noto Serif SC", serif;
+      font-size: 34px;
+      line-height: 0.9;
+    }
+
+    .hero-note,
+    .editor-note,
+    .journey-card,
+    .feature-card,
+    .decision-card,
+    .source-card,
+    .insight,
+    .matrix {
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-note {
+      background:
+        linear-gradient(180deg, rgba(24, 54, 50, 0.08), rgba(255, 255, 255, 0.5)),
+        rgba(255, 255, 255, 0.36);
+    }
+
+    .editor-note {
+      background: linear-gradient(135deg, rgba(154, 123, 74, 0.12), rgba(255, 255, 255, 0.44));
+      border-color: rgba(154, 123, 74, 0.14);
+    }
+
+    .section {
+      padding: 34px;
+    }
+
+    .section-head {
+      margin-bottom: 26px;
+    }
+
+    .section-head h2 {
+      max-width: 11ch;
+      font-size: clamp(38px, 5vw, 62px);
+      line-height: 0.92;
+    }
+
+    #compare .summary-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    #compare .summary-card--shared { grid-column: span 5; }
+    #compare .summary-card--codex { grid-column: span 3; }
+    #compare .summary-card--claude { grid-column: span 4; }
+
+    .summary-card {
+      min-height: 236px;
+    }
+
+    .matrix {
+      border-radius: 30px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(250, 245, 237, 0.78)),
+        rgba(255, 255, 255, 0.4);
+    }
+
+    .matrix-row:nth-child(even) .matrix-label,
+    .matrix-row:nth-child(even) .matrix-cell {
+      background: rgba(255, 255, 255, 0.34);
+    }
+
+    #journeys .journey-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .journey-card {
+      position: relative;
+      padding: 28px;
+      overflow: hidden;
+    }
+
+    .journey-card::after {
+      position: absolute;
+      right: 22px;
+      top: 18px;
+      font-family: "Cormorant Garamond", "Noto Serif SC", serif;
+      font-size: 96px;
+      line-height: 1;
+      color: rgba(22, 31, 34, 0.06);
+      pointer-events: none;
+    }
+
+    .journey-card:nth-child(1)::after { content: "01"; }
+    .journey-card:nth-child(2)::after { content: "02"; }
+
+    .journey-card:nth-child(1) {
+      background:
+        linear-gradient(180deg, rgba(20, 56, 51, 0.08), rgba(255, 255, 255, 0.52)),
+        rgba(255, 255, 255, 0.44);
+    }
+
+    .journey-card:nth-child(2) {
+      background:
+        linear-gradient(180deg, rgba(154, 123, 74, 0.08), rgba(255, 255, 255, 0.52)),
+        rgba(255, 255, 255, 0.44);
+    }
+
+    .steps {
+      gap: 16px;
+    }
+
+    .steps li {
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    .step-index {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(20, 56, 51, 0.16), rgba(154, 123, 74, 0.14));
+      box-shadow: inset 0 0 0 1px rgba(20, 27, 29, 0.06);
+    }
+
+    #capabilities .feature-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    #capabilities .feature-card:nth-child(1) { grid-column: span 5; }
+    #capabilities .feature-card:nth-child(2) { grid-column: span 3; }
+    #capabilities .feature-card:nth-child(3) { grid-column: span 4; }
+    #capabilities .feature-card:nth-child(4) { grid-column: span 4; }
+    #capabilities .feature-card:nth-child(5) { grid-column: span 5; }
+    #capabilities .feature-card:nth-child(6) { grid-column: span 3; }
+
+    .feature-card {
+      min-height: 230px;
+      padding: 24px;
+    }
+
+    .feature-card:nth-child(odd) {
+      background:
+        linear-gradient(180deg, rgba(20, 56, 51, 0.08), rgba(255, 255, 255, 0.52)),
+        rgba(255, 255, 255, 0.42);
+    }
+
+    .feature-card:nth-child(even) {
+      background:
+        linear-gradient(180deg, rgba(154, 123, 74, 0.08), rgba(255, 255, 255, 0.52)),
+        rgba(255, 255, 255, 0.42);
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .callout {
+      background: linear-gradient(135deg, rgba(20, 56, 51, 0.08), rgba(154, 123, 74, 0.09), rgba(255, 255, 255, 0.42));
+      border-color: rgba(20, 56, 51, 0.1);
+    }
+
+    .decision-grid {
+      grid-template-columns: 1.05fr 0.95fr 1fr;
+      gap: 20px;
+    }
+
+    .decision-card:nth-child(2) {
+      transform: translateY(20px);
+      background:
+        linear-gradient(180deg, rgba(154, 123, 74, 0.1), rgba(255, 255, 255, 0.54)),
+        rgba(255, 255, 255, 0.42);
+    }
+
+    #refs .source-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    #refs .source-card:nth-child(1) { grid-column: span 7; }
+    #refs .source-card:nth-child(2) { grid-column: span 5; }
+    #refs .source-card:nth-child(3) { grid-column: span 5; }
+    #refs .source-card:nth-child(4) { grid-column: span 7; }
+
+    .source-card {
+      min-height: 200px;
+      padding: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(246, 240, 232, 0.84)),
+        rgba(255, 255, 255, 0.42);
+    }
+
+    .footer-card {
+      padding: 28px 30px;
+    }
+
+    /* Technical dark layout */
+    :root {
+      color-scheme: dark;
+      --bg: #0a0d17;
+      --paper: rgba(18, 22, 34, 0.82);
+      --paper-soft: rgba(18, 22, 34, 0.74);
+      --paper-strong: #171c28;
+      --ink: #f3f6ff;
+      --ink-soft: rgba(243, 246, 255, 0.74);
+      --ink-faint: rgba(243, 246, 255, 0.48);
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.14);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 10% 12%, rgba(108, 134, 255, 0.16), transparent 22%),
+        radial-gradient(circle at 82% 16%, rgba(122, 217, 255, 0.12), transparent 18%),
+        linear-gradient(180deg, #090c15 0%, #070910 52%, #06070d 100%);
+      color: var(--ink);
+      font-family: "Manrope", "Noto Sans SC", sans-serif;
+    }
+
+    body::before {
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.32;
+    }
+
+    .orb { display: none; }
+
+    .topbar {
+      background: rgba(8, 10, 18, 0.78);
+      border-bottom-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .brand-mark {
+      background: linear-gradient(135deg, #a9dbff, #7b9fff 58%, #d0dcff);
+      color: #0d1322;
+      box-shadow: 0 16px 36px rgba(100, 133, 255, 0.22);
+    }
+
+    .brand-copy strong {
+      font-family: "Manrope", "Noto Sans SC", sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-copy span {
+      color: var(--ink-faint);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav a {
+      color: var(--ink-soft);
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-panel,
+    .section,
+    .footer-card {
+      background:
+        linear-gradient(180deg, rgba(29, 34, 49, 0.82), rgba(12, 16, 27, 0.9)),
+        rgba(12, 16, 27, 0.84);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
+    }
+
+    .hero-panel::before,
+    .section::before,
+    .footer-card::before {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.16), transparent 70%);
+    }
+
+    .hero-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+      gap: 26px;
+    }
+
+    .guide-hero {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .eyebrow,
+    .section-kicker,
+    .tiny-pill,
+    .badge,
+    .summary-card .meta,
+    .source-card .meta {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: var(--ink-soft);
+    }
+
+    .hero-copy h1,
+    .section-head h2,
+    .hero-note h2,
+    .guide-card h3,
+    .mock h3,
+    .source-card h3 {
+      font-family: "Manrope", "Noto Sans SC", sans-serif;
+      color: var(--ink);
       letter-spacing: -0.05em;
     }
 
-    .tiny-note {
-      font-size: 13px;
+    .hero-copy h1 {
+      max-width: none;
+      font-size: clamp(24px, 3vw, 48px);
+      line-height: 1.08;
+      white-space: nowrap;
     }
 
-    @media (max-width: 1180px) {
+    .hero-copy p,
+    .section-head p,
+    .hero-note p,
+    .guide-card p,
+    .source-card p,
+    .small-note,
+    .code-note {
+      color: var(--ink-soft);
+    }
+
+    .btn-primary {
+      color: #08101f;
+      background: linear-gradient(135deg, #d8ebff, #a7d3ff);
+      box-shadow: 0 18px 40px rgba(95, 161, 255, 0.16);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-note,
+    .guide-card,
+    .mock,
+    .source-card {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025)),
+        rgba(9, 13, 24, 0.84);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-note,
+    .guide-card,
+    .mock,
+    .source-card,
+    .section {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-note::before,
+    .guide-card::before,
+    .mock::before,
+    .source-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.16), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-note {
+      padding: 22px;
+    }
+
+    .hero-note-grid {
+      gap: 12px;
+    }
+
+    .section {
+      padding: 30px;
+    }
+
+    .section-head {
+      margin-bottom: 20px;
+    }
+
+    .section-head h2 {
+      max-width: none;
+      font-size: clamp(34px, 4vw, 52px);
+      line-height: 0.96;
+    }
+
+    .tabs {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 7px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      margin-bottom: 18px;
+    }
+
+    .tabs button {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 10px 16px;
+      cursor: pointer;
+      color: var(--ink-soft);
+      background: transparent;
+      transition: 0.2s ease;
+    }
+
+    .tabs button.active {
+      color: #08101f;
+      background: linear-gradient(135deg, #d8ebff, #b7dbff);
+      box-shadow: 0 10px 24px rgba(114, 171, 255, 0.2);
+    }
+
+    .platform-panel {
+      display: none;
+    }
+
+    .platform-panel.active {
+      display: block;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+      gap: 18px;
+    }
+
+    .stack-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .guide-card,
+    .mock {
+      padding: 22px;
+    }
+
+    .path {
+      margin-bottom: 12px;
+      color: var(--ink-faint);
+      font-size: 13px;
+      font-family: "IBM Plex Mono", monospace;
+    }
+
+    .code-window {
+      border-radius: 22px;
+      background: linear-gradient(180deg, #11172a, #090d19);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .window-head {
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+      color: rgba(243, 246, 255, 0.7);
+    }
+
+    pre {
+      color: #f3f6ff;
+      font-size: 13px;
+      line-height: 1.85;
+    }
+
+    .copy-btn {
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .step-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--ink-soft);
+      line-height: 1.85;
+    }
+
+    .step-list li + li {
+      margin-top: 8px;
+    }
+
+    .step-list code {
+      color: #ffffff;
+    }
+
+    .small-note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(169, 219, 255, 0.08), rgba(255, 255, 255, 0.04));
+      border: 1px solid rgba(169, 219, 255, 0.12);
+      line-height: 1.8;
+    }
+
+    .mock {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink-faint);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .field-value {
+      color: #ffffff;
+      word-break: break-all;
+      font-family: "IBM Plex Mono", monospace;
+    }
+
+    .compact-sources {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .source-card {
+      padding: 22px;
+      min-height: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025)),
+        rgba(9, 13, 24, 0.84);
+    }
+
+    .source-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(169, 219, 255, 0.22);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03)),
+        rgba(9, 13, 24, 0.88);
+    }
+
+    .subsection-head {
+      margin: 22px 0 14px;
+    }
+
+    .subsection-head h3 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .subsection-head p {
+      margin: 0;
+      color: var(--ink-soft);
+      line-height: 1.8;
+    }
+
+    /* Polish pass */
+    .shell {
+      width: min(1240px, calc(100% - 40px));
+      padding-bottom: 78px;
+    }
+
+    .topbar-inner {
+      min-height: 72px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+    }
+
+    .brand-copy strong {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .brand-copy span {
+      font-size: 11px;
+    }
+
+    .nav {
+      gap: 10px;
+    }
+
+    .nav a {
+      padding: 9px 15px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero {
+      padding: 26px 0 12px;
+    }
+
+    .hero-panel {
+      padding: 28px 32px 30px;
+    }
+
+    .hero-copy {
+      gap: 16px;
+      max-width: 900px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      padding: 7px 12px;
+      letter-spacing: 0.09em;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(24px, 2.7vw, 42px);
+      line-height: 1.06;
+      letter-spacing: -0.065em;
+      font-weight: 800;
+    }
+
+    .hero-actions {
+      padding-top: 2px;
+      gap: 10px;
+    }
+
+    .btn {
+      min-width: 132px;
+      padding: 13px 18px;
+      border-radius: 16px;
+      font-size: 15px;
+    }
+
+    .main {
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .section {
+      padding: 28px;
+      border-radius: 30px;
+    }
+
+    .section-head {
+      margin-bottom: 18px;
+      gap: 14px;
+    }
+
+    .section-kicker {
+      font-size: 11px;
+      padding: 7px 11px;
+    }
+
+    .section-head h2 {
+      font-family: "Manrope", "Noto Sans SC", sans-serif;
+      font-size: clamp(28px, 3vw, 38px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .section-head p {
+      max-width: 680px;
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+
+    .tabs {
+      gap: 6px;
+      padding: 6px;
+      margin-bottom: 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .tabs button {
+      position: relative;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .tabs button:not(.active):hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tabs button.active {
+      background: linear-gradient(135deg, #d9edff, #b6daff);
+      box-shadow: 0 8px 20px rgba(115, 173, 255, 0.22);
+    }
+
+    .panel-grid {
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .stack-grid {
+      gap: 16px;
+    }
+
+    .guide-card,
+    .mock,
+    .source-card {
+      padding: 20px;
+      border-radius: 22px;
+    }
+
+    .guide-card h3,
+    .mock h3,
+    .source-card h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+    }
+
+    .path {
+      margin-bottom: 10px;
+      font-size: 12px;
+      letter-spacing: 0.01em;
+    }
+
+    .code-window {
+      border-radius: 20px;
+      background: linear-gradient(180deg, #0f1528, #090d18);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 14px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .window-head {
+      padding: 12px 14px;
+      font-size: 11px;
+      letter-spacing: 0.09em;
+    }
+
+    .copy-btn {
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    pre {
+      padding: 18px 18px 20px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .step-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: guide-step;
+      display: grid;
+      gap: 10px;
+    }
+
+    .step-list li {
+      counter-increment: guide-step;
+      position: relative;
+      padding-left: 40px;
+      line-height: 1.75;
+    }
+
+    .step-list li::before {
+      content: counter(guide-step);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(169, 219, 255, 0.1);
+      color: #d7ecff;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(169, 219, 255, 0.18);
+    }
+
+    .small-note {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.72;
+      background: linear-gradient(135deg, rgba(169, 219, 255, 0.07), rgba(255, 255, 255, 0.035));
+    }
+
+    .subsection-head {
+      margin: 26px 0 12px;
+    }
+
+    .subsection-head h3 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .subsection-head p {
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    #access .panel-grid {
+      grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.15fr);
+    }
+
+    .field-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      min-height: 88px;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field-label {
+      margin-bottom: 7px;
+      font-size: 11px;
+    }
+
+    .field-value {
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .compact-sources {
+      gap: 16px;
+    }
+
+    .source-card {
+      min-height: 148px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .orb,
+      .reveal,
+      .btn,
+      .source-card { animation: none; transition: none; }
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    @media (max-width: 1160px) {
       .hero-grid,
-      .spotlight,
-      .grid-2,
-      .grid-3,
-      .grid-4,
-      .timeline,
-      .resource-list,
-      .footer-card {
+      .panel-grid,
+      .compact-sources,
+      .summary-grid,
+      .journey-grid,
+      .feature-grid,
+      .decision-grid,
+      .source-grid,
+      .insight,
+      .footer-card,
+      .hero-strip {
         grid-template-columns: 1fr;
       }
 
-      .spotlight-items,
-      .hero-metrics {
+      .matrix-row {
         grid-template-columns: 1fr;
       }
 
-      .hero h1 {
-        max-width: none;
+      .matrix-cell + .matrix-cell {
+        border-left: 0;
+        border-top: 1px solid rgba(23, 37, 45, 0.08);
+      }
+
+      .strip-card {
+        border-left: 0;
+        padding-left: 0;
+      }
+
+      .decision-card:nth-child(2) {
+        transform: none;
+      }
+
+      .guide-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .field-grid {
+        grid-template-columns: 1fr;
       }
     }
 
     @media (max-width: 760px) {
       :root {
-        --container: min(100% - 20px, 1320px);
+        --container: min(100% - 18px, 1180px);
         --nav-h: auto;
       }
 
       .topbar-inner,
-      .section,
       .hero-panel,
+      .section,
       .footer-card {
         padding-left: 18px;
         padding-right: 18px;
@@ -800,8 +1844,8 @@
 
       .topbar-inner {
         width: var(--container);
-        padding-top: 16px;
-        padding-bottom: 16px;
+        padding-top: 14px;
+        padding-bottom: 14px;
         align-items: flex-start;
         flex-direction: column;
       }
@@ -811,239 +1855,356 @@
       }
 
       .hero {
-        padding-top: 22px;
+        padding-top: 18px;
       }
 
       .hero-panel,
       .section,
-      .spotlight,
       .footer-card {
         border-radius: 24px;
       }
 
-      .hero-panel { padding-top: 24px; padding-bottom: 24px; }
+      .hero-panel { padding-top: 22px; padding-bottom: 22px; }
       .section { padding-top: 22px; padding-bottom: 22px; }
-      .spotlight { padding: 18px; }
-      .card, .stack-card, .resource-card, .mock, .terminal-card, .timeline-card { padding: 18px; border-radius: 20px; }
+      .hero-copy h1,
+      .section-head h2 { max-width: none; }
+      .hero-copy h1 {
+        white-space: normal;
+        font-size: clamp(32px, 11vw, 48px);
+      }
+      .hero-note,
+      .guide-card,
+      .mock,
+      .summary-card,
+      .journey-card,
+      .feature-card,
+      .decision-card,
+      .source-card,
+      .insight { padding: 18px; border-radius: 20px; }
+      .footer-card { padding-top: 22px; padding-bottom: 22px; }
     }
   </style>
 </head>
 <body>
+  <div class="orb orb-left"></div>
+  <div class="orb orb-right"></div>
+
   <header class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="#overview">
-        <div class="brand-mark">C</div>
-        <div class="brand-copy">
-          <strong>Codex 高级文档站</strong>
-          <span>Install · Config · IDE · CCSwitch</span>
-        </div>
+      <a class="brand" href="#overview" aria-label="回到顶部">
+        <span class="brand-mark">AI</span>
+        <span class="brand-copy">
+          <strong>Field Notes</strong>
+          <span>Claude Code × Codex CLI</span>
+        </span>
       </a>
-      <nav class="nav">
-        <a href="#overview">概览</a>
-        <a href="#install">安装</a>
-        <a href="#config">配置</a>
-        <a href="#vscode">客户端</a>
+
+      <nav class="nav" aria-label="主导航">
+        <a href="#overview">首页</a>
+        <a href="#codex">Codex</a>
+        <a href="#claude">Claude</a>
+        <a href="#access">接入示意</a>
         <a href="#ccswitch">CCSwitch</a>
-        <a href="#refs">参考</a>
+        <a href="#refs">来源</a>
       </nav>
     </div>
   </header>
 
   <div class="shell">
-    <section class="hero" id="overview">
+    <section class="hero reveal is-visible" id="overview">
       <div class="hero-panel">
-        <div class="hero-grid">
+        <div class="hero-grid guide-hero">
           <div class="hero-copy">
-            <span class="eyebrow">OpenAI Codex · 2026-04-16 更新</span>
-            <h1>把 Codex 文档做成真正高级的展示页</h1>
-            <p class="lede">这一版不再只是“信息堆叠”，而是改成更像高端开发者产品官网的文档首页：更强首屏价值表达、更清晰的信息层级、更精致的代码窗口、更统一的深色设计系统，以及更好的阅读沉浸感。</p>
+            <span class="eyebrow">Install & Use / 2026-04-17</span>
+            <h1>Claude Code 与 Codex CLI 多平台安装使用</h1>
+
             <div class="hero-actions">
-              <a class="btn btn-primary" href="#install">开始安装</a>
-              <a class="btn btn-ghost" href="#ccswitch">查看 CCSwitch</a>
+              <a class="btn btn-primary" href="#codex">看 Codex</a>
+              <a class="btn btn-secondary" href="#claude">看 Claude</a>
             </div>
-            <div class="hero-metrics">
-              <div class="metric">
-                <strong>3 分钟</strong>
-                <span>完成安装、登录与第一条 Codex 命令。</span>
-              </div>
-              <div class="metric">
-                <strong>1 份配置</strong>
-                <span>覆盖用户级、项目级与临时命令切换逻辑。</span>
-              </div>
-              <div class="metric">
-                <strong>3 类接入</strong>
-                <span>CLI、VS Code / 客户端、CCSwitch 一次看全。</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="hero-aside">
-            <div class="terminal-window">
-              <div class="window-head">
-                <span>Quick Start</span>
-                <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-              </div>
-              <pre>$ npm install -g @openai/codex
-$ codex
-$ codex -m gpt-5.4
-$ codex exec "review this repo"
-$ codex login --device-auth</pre>
-            </div>
-
-            <div class="hero-card">
-              <h2>为什么这页更高级</h2>
-              <p>从“普通静态说明页”升级成“高质感产品文档首页”，重点在于：首屏更有张力、版式更通透、视觉统一度更高，且依然保留原来的安装、配置、模型、客户端与 CCSwitch 核心内容。</p>
-              <div class="command-list">
-                <div class="command-pill"><span>默认模型</span><code>gpt-5.4</code></div>
-                <div class="command-pill"><span>兼容地址</span><code>https://yjxapi-gpt.xyz/v1</code></div>
-                <div class="command-pill"><span>认证方式</span><code>ChatGPT / API key / device auth</code></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="spotlight">
-        <div class="spotlight-label">
-          <strong>内容范围</strong>
-          <span>一页讲透</span>
-        </div>
-        <div class="spotlight-items">
-          <div class="spotlight-item">
-            <strong>安装与认证</strong>
-            <p>CLI 安装、首次运行、ChatGPT 登录、device auth 的最短路径。</p>
-          </div>
-          <div class="spotlight-item">
-            <strong>配置与模型</strong>
-            <p>用户级 / 项目级配置优先级、模型选择和临时切换方式。</p>
-          </div>
-          <div class="spotlight-item">
-            <strong>编辑器与代理层</strong>
-            <p>VS Code、兼容客户端、CCSwitch 的接入示例放到同一视觉系统里。</p>
           </div>
         </div>
       </div>
     </section>
 
     <main class="main">
-      <section class="section" id="install">
+      <section class="section reveal" id="codex" style="--delay: 40ms;">
         <div class="section-head">
           <div>
-            <span class="tiny-label">01 · Quickstart</span>
-            <h2>安装与启动</h2>
-            <p class="section-intro">保留原始文档重点，但重新组织成更清晰的路径：先装 CLI，再完成登录，最后在当前目录直接交给 Codex 执行任务。若远程环境拉不起浏览器，就切到 <code>codex login --device-auth</code>。</p>
+            <span class="section-kicker">01 · CODEX CLI</span>
+            <h2>Codex CLI 安装与使用</h2>
+            <p>先安装，再运行 <code>codex</code>。Windows 优先走 WSL2。</p>
           </div>
         </div>
 
-        <div class="grid-2">
-          <div class="terminal-card">
-            <h3>安装命令</h3>
-            <div class="code-window">
-              <div class="window-head">
-                <span>Install</span>
-                <button class="copy-btn" data-copy="install-code">复制</button>
-              </div>
-              <pre id="install-code">npm install -g @openai/codex
+        <div class="tabs" role="tablist" aria-label="Codex platform switcher">
+          <button class="active" type="button" role="tab" aria-selected="true" data-platform-tab="codex-mac">macOS / Linux</button>
+          <button type="button" role="tab" aria-selected="false" data-platform-tab="codex-win">Windows</button>
+        </div>
+
+        <div class="platform-panel active" data-platform-panel="codex-mac">
+          <div class="panel-grid">
+            <article class="guide-card">
+              <div class="path">Install</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>Codex CLI</span>
+                  <button class="copy-btn" data-copy="codex-mac-install">复制</button>
+                </div>
+                <pre id="codex-mac-install">npm install -g @openai/codex
+# or
 brew install codex
 
+cd your-project
 codex</pre>
-            </div>
-          </div>
+              </div>
+            </article>
 
-          <div class="stack-card">
-            <h3>最快上手方式</h3>
-            <div class="timeline">
-              <div class="timeline-card">
-                <div class="step">1</div>
-                <h3>安装 CLI</h3>
-                <p>用 npm 或 Homebrew 直接安装，尽量保持环境简单干净。</p>
+            <article class="guide-card">
+              <h3>使用流程</h3>
+              <ol class="step-list">
+                <li>进入项目目录。</li>
+                <li>运行 <code>codex</code> 并完成登录。</li>
+                <li>直接输入任务开始使用。</li>
+              </ol>
+              <div class="small-note"><code>codex --help</code> 可查看全部命令。</div>
+            </article>
+          </div>
+        </div>
+
+        <div class="platform-panel" data-platform-panel="codex-win">
+          <div class="panel-grid">
+            <article class="guide-card">
+              <div class="path">Windows / WSL2</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>Codex CLI</span>
+                  <button class="copy-btn" data-copy="codex-win-install">复制</button>
+                </div>
+                <pre id="codex-win-install">wsl --install
+
+# 进入 Ubuntu 之后执行
+npm install -g @openai/codex
+
+cd your-project
+codex</pre>
               </div>
-              <div class="timeline-card">
-                <div class="step">2</div>
-                <h3>完成登录</h3>
-                <p>默认走 ChatGPT 登录；远程环境可使用 device auth。</p>
-              </div>
-              <div class="timeline-card">
-                <div class="step">3</div>
-                <h3>进入项目目录</h3>
-                <p>Codex 很适合在当前仓库上下文里直接执行任务。</p>
-              </div>
-              <div class="timeline-card">
-                <div class="step">4</div>
-                <h3>开始协作</h3>
-                <p>从 <code>codex</code> 或 <code>codex exec</code> 开始即可。</p>
-              </div>
-            </div>
-            <div class="callout" style="margin-top:18px;">登录状态一般会写入系统凭据库或 <code>~/.codex/auth.json</code>。公开页面里只保留占位符，不放真实密钥。</div>
+            </article>
+
+            <article class="guide-card">
+              <h3>使用流程</h3>
+              <ol class="step-list">
+                <li>先装好 WSL2。</li>
+                <li>在 Linux 环境里安装并运行 <code>codex</code>。</li>
+                <li>登录后直接开始使用。</li>
+              </ol>
+              <div class="small-note">Windows 下官方建议优先使用 WSL2。</div>
+            </article>
           </div>
         </div>
       </section>
 
-      <section class="section" id="config">
+      <section class="section reveal" id="claude" style="--delay: 80ms;">
         <div class="section-head">
           <div>
-            <span class="tiny-label">02 · Config</span>
-            <h2>配置与模型</h2>
-            <p class="section-intro">这一节改成更像高级产品文档的“策略层 + 实际配置”双栏展示：左边直接给出可复制配置，右边解释优先级和模型选择逻辑，让页面既好看又实用。</p>
+            <span class="section-kicker">02 · CLAUDE CODE</span>
+            <h2>Claude Code 安装与使用</h2>
+            <p>只保留安装、登录和启动。</p>
           </div>
         </div>
 
-        <div class="grid-2">
-          <div class="stack-card">
-            <h3>用户级默认配置</h3>
-            <div class="code-window">
-              <div class="window-head">
-                <span>~/.codex/config.toml</span>
-                <button class="copy-btn" data-copy="config-code">复制</button>
-              </div>
-              <pre id="config-code">model = "gpt-5.4"
-model_reasoning_effort = "high"
-approval_policy = "on-request"
-sandbox_mode = "workspace-write"
-cli_auth_credentials_store = "keyring"</pre>
-            </div>
-            <div class="config-note" style="margin-top:18px;">项目级覆盖放在仓库内的 <code>.codex/config.toml</code>；CLI flags 和 <code>--config</code> 优先级最高，其次才是 profile、项目级、用户级。</div>
-          </div>
+        <div class="tabs" role="tablist" aria-label="Claude platform switcher">
+          <button class="active" type="button" role="tab" aria-selected="true" data-platform-tab="claude-mac">macOS / Linux</button>
+          <button type="button" role="tab" aria-selected="false" data-platform-tab="claude-win">Windows</button>
+        </div>
 
-          <div class="config-stack">
-            <div class="card">
-              <h3>推荐模型</h3>
-              <ul class="list">
-                <li><code>gpt-5.4</code>：优先推荐，兼顾编码、推理和 agent 工作流。</li>
-                <li><code>gpt-5.4-mini</code>：更快更省，适合轻量任务或 subagents。</li>
-                <li><code>gpt-5.3-codex-spark</code>：更偏实时迭代；复杂工程也可考虑 <code>gpt-5.3-codex</code>。</li>
-              </ul>
-            </div>
-            <div class="card">
-              <h3>临时切换方式</h3>
-              <p>新开线程时直接用 <code>codex -m gpt-5.4</code>。正在进行中的会话，可以用 <code>/model</code> 快速切换，而不必改动默认配置。</p>
-            </div>
-            <div class="card">
-              <h3>项目信任机制</h3>
-              <p>如果项目没有被信任，Codex 会跳过项目级 <code>.codex/</code> 配置。因此“配置写了但没生效”时，优先检查项目信任状态。</p>
-            </div>
+        <div class="platform-panel active" data-platform-panel="claude-mac">
+          <div class="panel-grid">
+            <article class="guide-card">
+              <div class="path">Install</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>Claude Code</span>
+                  <button class="copy-btn" data-copy="claude-mac-install">复制</button>
+                </div>
+                <pre id="claude-mac-install">curl -fsSL https://claude.ai/install.sh | bash
+# or
+brew install --cask claude-code
+
+cd your-project
+claude</pre>
+              </div>
+            </article>
+
+            <article class="guide-card">
+              <h3>使用流程</h3>
+              <ol class="step-list">
+                <li>进入项目目录。</li>
+                <li>运行 <code>claude</code> 并完成登录。</li>
+                <li>直接输入任务开始使用。</li>
+              </ol>
+              <div class="small-note">原生安装会自动更新；Homebrew 需要手动升级。</div>
+            </article>
+          </div>
+        </div>
+
+        <div class="platform-panel" data-platform-panel="claude-win">
+          <div class="panel-grid">
+            <article class="guide-card">
+              <div class="path">Windows</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>Claude Code</span>
+                  <button class="copy-btn" data-copy="claude-win-install">复制</button>
+                </div>
+                <pre id="claude-win-install">winget install Anthropic.ClaudeCode
+
+# 建议先安装 Git for Windows
+
+cd your-project
+claude</pre>
+              </div>
+            </article>
+
+            <article class="guide-card">
+              <h3>使用流程</h3>
+              <ol class="step-list">
+                <li>先安装 Claude Code 和 Git for Windows。</li>
+                <li>进入项目目录后运行 <code>claude</code>。</li>
+                <li>登录后直接开始使用。</li>
+              </ol>
+              <div class="small-note">Windows 下先准备好 Git 环境。</div>
+            </article>
+          </div>
+        </div>
+
+        <div class="subsection-head">
+          <h3>API 密钥配置</h3>
+          <p>Claude Code 走这个地址：<code>https://yjxapi-gpt.xyz</code>。API Key 先写 <code>xxx</code>。</p>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Claude API config switcher">
+          <button class="active" type="button" role="tab" aria-selected="true" data-platform-tab="claude-api-mac">macOS / Linux</button>
+          <button type="button" role="tab" aria-selected="false" data-platform-tab="claude-api-cmd">Windows CMD</button>
+          <button type="button" role="tab" aria-selected="false" data-platform-tab="claude-api-ps">PowerShell</button>
+        </div>
+
+        <div class="platform-panel active" data-platform-panel="claude-api-mac">
+          <div class="stack-grid">
+            <article class="guide-card">
+              <div class="path">Terminal</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>CLAUDE CODE</span>
+                  <button class="copy-btn" data-copy="claude-api-mac-env">复制</button>
+                </div>
+                <pre id="claude-api-mac-env">export ANTHROPIC_BASE_URL="https://yjxapi-gpt.xyz"
+export ANTHROPIC_AUTH_TOKEN="xxx"
+export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1</pre>
+              </div>
+            </article>
+
+            <article class="guide-card">
+              <div class="path">~/.claude/settings.json</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>VSCODE CLAUDE CODE</span>
+                  <button class="copy-btn" data-copy="claude-api-mac-json">复制</button>
+                </div>
+                <pre id="claude-api-mac-json">{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://yjxapi-gpt.xyz",
+    "ANTHROPIC_AUTH_TOKEN": "xxx",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0"
+  }
+}</pre>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="platform-panel" data-platform-panel="claude-api-cmd">
+          <div class="stack-grid">
+            <article class="guide-card">
+              <div class="path">Command Prompt</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>CLAUDE CODE</span>
+                  <button class="copy-btn" data-copy="claude-api-cmd-env">复制</button>
+                </div>
+                <pre id="claude-api-cmd-env">set ANTHROPIC_BASE_URL=https://yjxapi-gpt.xyz
+set ANTHROPIC_AUTH_TOKEN=xxx
+set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1</pre>
+              </div>
+            </article>
+
+            <article class="guide-card">
+              <div class="path">%userprofile%\.claude\settings.json</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>VSCODE CLAUDE CODE</span>
+                  <button class="copy-btn" data-copy="claude-api-cmd-json">复制</button>
+                </div>
+                <pre id="claude-api-cmd-json">{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://yjxapi-gpt.xyz",
+    "ANTHROPIC_AUTH_TOKEN": "xxx",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0"
+  }
+}</pre>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="platform-panel" data-platform-panel="claude-api-ps">
+          <div class="stack-grid">
+            <article class="guide-card">
+              <div class="path">PowerShell</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>CLAUDE CODE</span>
+                  <button class="copy-btn" data-copy="claude-api-ps-env">复制</button>
+                </div>
+                <pre id="claude-api-ps-env">$env:ANTHROPIC_BASE_URL="https://yjxapi-gpt.xyz"
+$env:ANTHROPIC_AUTH_TOKEN="xxx"
+$env:CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1"</pre>
+              </div>
+            </article>
+
+            <article class="guide-card">
+              <div class="path">%userprofile%\.claude\settings.json</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>VSCODE CLAUDE CODE</span>
+                  <button class="copy-btn" data-copy="claude-api-ps-json">复制</button>
+                </div>
+                <pre id="claude-api-ps-json">{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://yjxapi-gpt.xyz",
+    "ANTHROPIC_AUTH_TOKEN": "xxx",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0"
+  }
+}</pre>
+              </div>
+            </article>
           </div>
         </div>
       </section>
 
-      <section class="section" id="vscode">
+      <section class="section reveal" id="access" style="--delay: 120ms;">
         <div class="section-head">
           <div>
-            <span class="tiny-label">03 · IDE & Clients</span>
-            <h2>VS Code 与兼容客户端</h2>
-            <p class="section-intro">这一块改成更现代的三列信息卡：既能保留文档说明，又像产品官网里的功能模块。视觉上更整洁，也更容易扫读。</p>
+            <span class="section-kicker">03 · ACCESS EXAMPLE</span>
+            <h2>接入示意</h2>
+            <p>只放示例，不放真实密钥。</p>
           </div>
         </div>
 
-        <div class="grid-3">
-          <div class="card">
-            <h3>VS Code</h3>
-            <p>安装 Codex 扩展后，通常能和 CLI 共用配置与登录态。看不到侧栏时，重启编辑器通常能恢复。</p>
-          </div>
-          <div class="card">
-            <h3>兼容客户端</h3>
-            <p>Cherry、Roo、Kilo 等客户端建议按 OpenAI 兼容方式配置，优先走 Responses API，减少后续兼容问题。</p>
-          </div>
+        <div class="panel-grid">
           <div class="mock">
             <h3>接入示意</h3>
             <div class="field-grid">
@@ -1061,33 +2222,42 @@ cli_auth_credentials_store = "keyring"</pre>
               </div>
             </div>
           </div>
+
+          <article class="guide-card">
+            <h3>怎么用这个示例</h3>
+            <ol class="step-list">
+              <li>客户端一般填写 API Key、Base URL、Model。</li>
+              <li>页面里只放占位符。</li>
+              <li>真实密钥只写在你自己的本地配置里。</li>
+            </ol>
+          </article>
         </div>
       </section>
 
-      <section class="section" id="ccswitch">
+      <section class="section reveal" id="ccswitch" style="--delay: 160ms;">
         <div class="section-head">
           <div>
-            <span class="tiny-label">04 · Proxy Layer</span>
+            <span class="section-kicker">04 · PROXY LAYER</span>
             <h2>CCSwitch 配置</h2>
-            <p class="section-intro">这一节重新做成更高级的标签切换面板，减少原先“普通文档块”的观感。请求地址继续保持为 <code>https://yjxapi-gpt.xyz/v1</code>，真实密钥仍然只用占位符演示。</p>
+            <p>保留平台切换，请求地址继续用 <code>https://yjxapi-gpt.xyz/v1</code>。</p>
           </div>
         </div>
 
-        <div class="tabs" role="tablist" aria-label="CCSwitch OS switcher">
-          <button class="active" type="button" role="tab" aria-selected="true" data-os-tab="mac">macOS / Linux</button>
-          <button type="button" role="tab" aria-selected="false" data-os-tab="win">Windows</button>
+        <div class="tabs" role="tablist" aria-label="CCSwitch platform switcher">
+          <button class="active" type="button" role="tab" aria-selected="true" data-platform-tab="ccswitch-mac">macOS / Linux</button>
+          <button type="button" role="tab" aria-selected="false" data-platform-tab="ccswitch-win">Windows</button>
         </div>
 
-        <div class="ccswitch-panel active" data-os-panel="mac">
-          <div class="ccswitch-stack">
-            <div class="stack-card">
+        <div class="platform-panel active" data-platform-panel="ccswitch-mac">
+          <div class="stack-grid">
+            <article class="guide-card">
               <div class="path">~/.codex/config.toml</div>
               <div class="code-window">
                 <div class="window-head">
-                  <span>CCSwitch macOS / Linux</span>
-                  <button class="copy-btn" data-copy="ccswitch-mac">复制</button>
+                  <span>CCSWITCH MACOS / LINUX</span>
+                  <button class="copy-btn" data-copy="ccswitch-mac-config">复制</button>
                 </div>
-                <pre id="ccswitch-mac">model_provider = "OpenAI"
+                <pre id="ccswitch-mac-config">model_provider = "OpenAI"
 model = "gpt-5.4"
 review_model = "gpt-5.4"
 model_reasoning_effort = "xhigh"
@@ -1103,33 +2273,33 @@ base_url = "https://yjxapi-gpt.xyz/v1"
 wire_api = "responses"
 requires_openai_auth = true</pre>
               </div>
-            </div>
+            </article>
 
-            <div class="stack-card">
+            <article class="guide-card">
               <div class="path">~/.codex/auth.json</div>
               <div class="code-window">
                 <div class="window-head">
-                  <span>Auth Example</span>
-                  <button class="copy-btn" data-copy="auth-mac">复制</button>
+                  <span>AUTH EXAMPLE</span>
+                  <button class="copy-btn" data-copy="ccswitch-mac-auth">复制</button>
                 </div>
-                <pre id="auth-mac">{
+                <pre id="ccswitch-mac-auth">{
   "OPENAI_API_KEY": "sk-你的密钥"
 }</pre>
               </div>
-            </div>
+            </article>
           </div>
         </div>
 
-        <div class="ccswitch-panel" data-os-panel="win">
-          <div class="ccswitch-stack">
-            <div class="stack-card">
+        <div class="platform-panel" data-platform-panel="ccswitch-win">
+          <div class="stack-grid">
+            <article class="guide-card">
               <div class="path">%userprofile%\.codex\config.toml</div>
               <div class="code-window">
                 <div class="window-head">
-                  <span>CCSwitch Windows</span>
-                  <button class="copy-btn" data-copy="ccswitch-win">复制</button>
+                  <span>CCSWITCH WINDOWS</span>
+                  <button class="copy-btn" data-copy="ccswitch-win-config">复制</button>
                 </div>
-                <pre id="ccswitch-win">model_provider = "OpenAI"
+                <pre id="ccswitch-win-config">model_provider = "OpenAI"
 model = "gpt-5.4"
 review_model = "gpt-5.4"
 model_reasoning_effort = "xhigh"
@@ -1145,79 +2315,65 @@ base_url = "https://yjxapi-gpt.xyz/v1"
 wire_api = "responses"
 requires_openai_auth = true</pre>
               </div>
-            </div>
+            </article>
 
-            <div class="stack-card">
+            <article class="guide-card">
               <div class="path">%userprofile%\.codex\auth.json</div>
               <div class="code-window">
                 <div class="window-head">
-                  <span>Auth Example</span>
-                  <button class="copy-btn" data-copy="auth-win">复制</button>
+                  <span>AUTH EXAMPLE</span>
+                  <button class="copy-btn" data-copy="ccswitch-win-auth">复制</button>
                 </div>
-                <pre id="auth-win">{
+                <pre id="ccswitch-win-auth">{
   "OPENAI_API_KEY": "sk-你的密钥"
 }</pre>
               </div>
-            </div>
+            </article>
           </div>
         </div>
       </section>
 
-      <section class="section" id="refs">
+      <section class="section reveal" id="refs" style="--delay: 200ms;">
         <div class="section-head">
           <div>
-            <span class="tiny-label">05 · References</span>
-            <h2>官方参考</h2>
-            <p class="section-intro">为了更稳地使用，继续保留 Help Center 与 GitHub 入口，并把它们做成更像“资源卡片”的样式。这样视觉更统一，也比普通链接列表更有高级感。</p>
+            <span class="section-kicker">05 · SOURCES</span>
+            <h2>官方来源</h2>
+            <p>只留最直接的几页。</p>
           </div>
         </div>
 
-        <div class="resource-list">
-          <a class="resource-card" href="https://help.openai.com/en/articles/11096431-openai-codex-ci-getting-started" target="_blank" rel="noreferrer">
-            <span class="resource-meta">OpenAI Help</span>
-            <h3>Codex CLI Getting Started</h3>
-            <p>安装、认证、Suggest / Auto Edit / Full Auto 的基础入口。</p>
+        <div class="source-grid compact-sources">
+          <a class="source-card" href="https://developers.openai.com/codex/cli" target="_blank" rel="noreferrer">
+            <span class="meta">OpenAI</span>
+            <h3>Codex CLI</h3>
+            <p>安装、登录、Windows 下 WSL2 提示。</p>
           </a>
-          <a class="resource-card" href="https://help.openai.com/en/articles/11381614" target="_blank" rel="noreferrer">
-            <span class="resource-meta">OpenAI Help</span>
-            <h3>Codex CLI and Sign in with ChatGPT</h3>
-            <p>ChatGPT 登录、自动生成 key、device auth 的说明页。</p>
+          <a class="source-card" href="https://developers.openai.com/codex/cli/features" target="_blank" rel="noreferrer">
+            <span class="meta">OpenAI</span>
+            <h3>Codex Features</h3>
+            <p>补充命令与功能入口。</p>
           </a>
-          <a class="resource-card" href="https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan" target="_blank" rel="noreferrer">
-            <span class="resource-meta">OpenAI Help</span>
-            <h3>Using Codex with your ChatGPT plan</h3>
-            <p>Codex 能力说明、计划限制，以及终端与 IDE 的使用入口。</p>
+          <a class="source-card" href="https://code.claude.com/docs/zh-CN/quickstart" target="_blank" rel="noreferrer">
+            <span class="meta">Anthropic</span>
+            <h3>Claude 中文 Quickstart</h3>
+            <p>安装、登录、启动、第一次使用。</p>
           </a>
-          <a class="resource-card" href="https://github.com/openai/codex" target="_blank" rel="noreferrer">
-            <span class="resource-meta">GitHub</span>
-            <h3>OpenAI Codex Repository</h3>
-            <p>CLI 仓库、README、安装说明和 issue 反馈入口。</p>
-          </a>
-        </div>
-
-        <div class="footer-card">
-          <div>
-            <strong>后续还可以继续往“高级文档站”方向迭代</strong>
-            <footer>如果你接下来还想加入 Cherry、Roo、Kilo 的专属接入块、架构图、FAQ、对比表甚至截图式模块，这个新版结构已经更适合继续扩展，而不用退回到普通个人主页样式。</footer>
-          </div>
-          <a class="btn btn-primary" href="#overview">回到顶部</a>
         </div>
       </section>
     </main>
   </div>
-
   <script>
-    document.querySelectorAll('[data-copy]').forEach((button) => {
-      button.addEventListener('click', async () => {
+    document.querySelectorAll("[data-copy]").forEach((button) => {
+      button.addEventListener("click", async () => {
         const target = document.getElementById(button.dataset.copy);
         if (!target) return;
         const original = button.textContent;
         try {
           await navigator.clipboard.writeText(target.textContent.trim());
-          button.textContent = 'Copied';
+          button.textContent = "已复制";
         } catch (error) {
           console.error(error);
-          button.textContent = 'Failed';
+          button.textContent = "失败";
         }
         window.setTimeout(() => {
           button.textContent = original;
@@ -1225,40 +2381,61 @@ requires_openai_auth = true</pre>
       });
     });
 
-    const osTabs = document.querySelectorAll('[data-os-tab]');
-    const osPanels = document.querySelectorAll('[data-os-panel]');
+    document.querySelectorAll(".tabs").forEach((tabList) => {
+      const tabs = Array.from(tabList.querySelectorAll("[data-platform-tab]"));
+      if (!tabs.length) return;
 
-    osTabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const target = tab.dataset.osTab;
-        osTabs.forEach((item) => {
-          const active = item.dataset.osTab === target;
-          item.classList.toggle('active', active);
-          item.setAttribute('aria-selected', active ? 'true' : 'false');
+      const activateTab = (targetKey) => {
+        tabs.forEach((tab) => {
+          const active = tab.dataset.platformTab === targetKey;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", active ? "true" : "false");
         });
-        osPanels.forEach((panel) => {
-          panel.classList.toggle('active', panel.dataset.osPanel === target);
+
+        document.querySelectorAll("[data-platform-panel]").forEach((panel) => {
+          if (!tabs.some((tab) => tab.dataset.platformTab === panel.dataset.platformPanel)) return;
+          panel.classList.toggle("active", panel.dataset.platformPanel === targetKey);
         });
+      };
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => activateTab(tab.dataset.platformTab));
       });
     });
 
-    const navLinks = document.querySelectorAll('.nav a');
-    const sections = Array.from(document.querySelectorAll('section[id]'));
+    const navLinks = document.querySelectorAll(".nav a");
+    const sections = Array.from(document.querySelectorAll("section[id]"));
 
     const updateActiveNav = () => {
       const offset = window.scrollY + 140;
-      let currentId = sections[0]?.id || '';
+      let currentId = sections[0]?.id || "";
       sections.forEach((section) => {
         if (offset >= section.offsetTop) currentId = section.id;
       });
       navLinks.forEach((link) => {
-        const active = link.getAttribute('href') === `#${currentId}`;
-        link.classList.toggle('active', active);
+        const active = link.getAttribute("href") === `#${currentId}`;
+        link.classList.toggle("active", active);
       });
     };
 
     updateActiveNav();
-    window.addEventListener('scroll', updateActiveNav, { passive: true });
+    window.addEventListener("scroll", updateActiveNav, { passive: true });
+
+    const reveals = document.querySelectorAll(".reveal:not(.is-visible)");
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          currentObserver.unobserve(entry.target);
+        });
+      }, { threshold: 0.16 });
+
+      reveals.forEach((item) => observer.observe(item));
+    } else {
+      reveals.forEach((item) => item.classList.add("is-visible"));
+    }
   </script>
 </body>
 </html>
