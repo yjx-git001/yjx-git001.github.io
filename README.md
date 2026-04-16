@@ -1,36 +1,43 @@
-# Codex 使用文档页
+# Claude Code / Codex CLI 安装使用页
 
-这个仓库已经从原来的个人主页，改成了一个纯静态的 **Codex 说明页**。
+这个仓库现在是一个纯静态说明页，内容聚焦在：
 
-目前首页包含这些内容：
+- Claude Code 的多平台安装与使用
+- Codex CLI 的多平台安装与使用
+- OpenAI 兼容接入示意
+- CCSwitch 的 macOS / Linux / Windows 配置切换
 
-- Codex CLI 的安装与首次启动
-- `~/.codex/config.toml` 的基础配置
-- `gpt-5.4` 等模型的推荐与切换方式
-- VS Code / 兼容客户端的接入说明
-- CCSwitch 的 macOS、Linux、Windows 配置示例
+## 当前页面内容
+
+- Codex CLI
+  macOS / Linux、Windows / WSL2 的安装与启动方式
+- Claude Code
+  macOS / Linux、Windows 的安装与启动方式
+- Claude Code API 配置
+  `ANTHROPIC_BASE_URL=https://yjxapi-gpt.xyz`
+  `ANTHROPIC_AUTH_TOKEN=xxx`
+- 接入示意
+  `API Key / Base URL / Model` 示例卡片
+- CCSwitch
+  保留平台 switch，并继续使用 `https://yjxapi-gpt.xyz/v1`
 
 ## 本地查看
 
-直接打开 `index.html`，或者启动一个最简单的静态服务：
+直接打开 `index.html`，或者启动最简单的静态服务：
 
 ```bash
 python -m http.server 8080
 ```
 
-## 当前改动重点
+## 页面约定
 
-- 整站内容已换成 Codex 文档展示
-- 原个人主页逻辑已经移除
-- 页面底部增加了 CCSwitch 配置区
-- CCSwitch 里的请求地址已替换为 `https://yjxapi-gpt.xyz/v1`
-- 页面里的 API key 只保留占位符，避免泄露真实密钥
+- 页面里展示的密钥均为占位符，不放真实 key
+- Claude Code 配置地址使用 `https://yjxapi-gpt.xyz`
+- OpenAI 兼容接入与 CCSwitch 使用 `https://yjxapi-gpt.xyz/v1`
 
 ## 参考文档
 
-- https://developers.openai.com/codex/quickstart
-- https://developers.openai.com/codex/auth
-- https://developers.openai.com/codex/config-basic
-- https://developers.openai.com/codex/models
-- https://developers.openai.com/codex/ide
-- https://developers.openai.com/codex/cli/reference
+- https://developers.openai.com/codex/cli
+- https://developers.openai.com/codex/cli/features
+- https://code.claude.com/docs/zh-CN/quickstart
+- https://code.claude.com/docs/zh-CN/overview
