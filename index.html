@@ -1494,6 +1494,96 @@
       line-height: 1.8;
     }
 
+    .setup-flow {
+      display: grid;
+      gap: 26px;
+    }
+
+    .setup-step {
+      display: grid;
+      gap: 14px;
+    }
+
+    .setup-banner {
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid rgba(115, 173, 255, 0.14);
+      background: linear-gradient(135deg, rgba(216, 237, 255, 0.72), rgba(255, 255, 255, 0.48));
+      box-shadow: var(--shadow-md);
+    }
+
+    .setup-banner--hint {
+      background: linear-gradient(135deg, rgba(184, 231, 225, 0.5), rgba(216, 237, 255, 0.44));
+      border-color: rgba(15, 118, 110, 0.12);
+    }
+
+    .setup-banner strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .setup-banner p {
+      margin: 0;
+      color: var(--ink-soft);
+      line-height: 1.8;
+    }
+
+    .setup-banner code {
+      color: var(--coral);
+    }
+
+    .setup-code-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .setup-code-stack p,
+    .setup-choice-card p {
+      margin: 0;
+      color: var(--ink-soft);
+      line-height: 1.8;
+    }
+
+    .setup-cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 20px 22px;
+      border-radius: 22px;
+      border: 1px solid rgba(23, 37, 45, 0.09);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.54)),
+        var(--paper-soft);
+      box-shadow: var(--shadow-md);
+    }
+
+    .setup-cta p {
+      margin: 0;
+      color: var(--ink-soft);
+      line-height: 1.8;
+    }
+
+    .setup-choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .setup-choice-card {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .setup-choice-card .btn {
+      width: fit-content;
+      min-width: 0;
+    }
+
     /* Polish pass */
     .shell {
       width: min(1240px, calc(100% - 40px));
@@ -1790,6 +1880,7 @@
       .hero-grid,
       .panel-grid,
       .compact-sources,
+      .setup-choice-grid,
       .summary-grid,
       .journey-grid,
       .feature-grid,
@@ -1881,6 +1972,9 @@
       .decision-card,
       .source-card,
       .insight { padding: 18px; border-radius: 20px; }
+      .setup-banner,
+      .setup-cta { padding: 18px; border-radius: 20px; }
+      .setup-cta { align-items: flex-start; flex-direction: column; }
       .footer-card { padding-top: 22px; padding-bottom: 22px; }
     }
   </style>
@@ -1901,7 +1995,8 @@
 
       <nav class="nav" aria-label="主导航">
         <a href="#overview">首页</a>
-        <a href="#codex">Codex</a>
+        <a href="#setup">通用配置</a>
+        <a href="#codex">GPT</a>
         <a href="#claude">Claude</a>
         <a href="#access">接入示意</a>
         <a href="#ccswitch">CCSwitch</a>
@@ -1916,10 +2011,10 @@
         <div class="hero-grid guide-hero">
           <div class="hero-copy">
             <span class="eyebrow">Install & Use / 2026-04-17</span>
-            <h1>Claude Code 与 Codex CLI 多平台安装使用</h1>
+            <h1>Claude Code 与 Codex CLI 多平台安装使用说明</h1>
 
             <div class="hero-actions">
-              <a class="btn btn-primary" href="#codex">看 Codex</a>
+              <a class="btn btn-primary" href="#codex">看 GPT</a>
               <a class="btn btn-secondary" href="#claude">看 Claude</a>
             </div>
           </div>
@@ -1928,12 +2023,262 @@
     </section>
 
     <main class="main">
+      <section class="section reveal" id="setup" style="--delay: 20ms;">
+        <div class="section-head">
+          <div>
+            <span class="section-kicker">00 · QUICKSTART</span>
+            <h2>通用配置步骤</h2>
+            <p>先把 Node.js 和 Git 这两个基础环境准备好。基础配置完成后，再按你的需求选择走 GPT 路线或 Claude 路线。</p>
+          </div>
+        </div>
+
+        <div class="setup-flow">
+          <div class="setup-banner">
+            <strong>执行环境</strong>
+            <p>下面的步骤默认都在 Windows 或 macOS 的终端里完成。Node.js 和 Git 都属于基础开始配置，建议先装齐，再继续后面的工具安装。</p>
+          </div>
+
+          <div class="setup-step">
+            <div class="subsection-head">
+              <h3>1. 检查 Node.js</h3>
+              <p>先运行下面命令，确认本机已经安装 Node.js。只要能输出版本号，就说明环境正常。</p>
+            </div>
+
+            <article class="guide-card">
+              <div class="path">Terminal</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>NODE.JS CHECK</span>
+                  <button class="copy-btn" data-copy="setup-node-check">复制</button>
+                </div>
+                <pre id="setup-node-check">node -v</pre>
+              </div>
+            </article>
+
+            <div class="setup-banner setup-banner--hint">
+              <strong>如果没有 Node.js</strong>
+              <p>如果上面这条命令没有输出版本号，可以直接在终端里安装，然后重新打开终端再执行 <code>node -v</code> 和 <code>npm -v</code> 检查。</p>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Node.js setup platform switcher">
+              <button class="active" type="button" role="tab" aria-selected="true" data-platform-tab="setup-node-win">Windows</button>
+              <button type="button" role="tab" aria-selected="false" data-platform-tab="setup-node-mac">macOS</button>
+            </div>
+
+            <div class="platform-panel active" data-platform-panel="setup-node-win">
+              <div class="stack-grid">
+                <article class="guide-card">
+                  <div class="path">管理员终端</div>
+                  <div class="setup-code-stack">
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>WINDOWS INSTALL</span>
+                        <button class="copy-btn" data-copy="setup-node-win-install">复制</button>
+                      </div>
+                      <pre id="setup-node-win-install">winget install OpenJS.NodeJS.LTS</pre>
+                    </div>
+
+                    <div class="small-note">安装完成后，重新打开终端，检查是否生效：</div>
+
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>VERIFY</span>
+                        <button class="copy-btn" data-copy="setup-node-win-verify">复制</button>
+                      </div>
+                      <pre id="setup-node-win-verify">node -v
+npm -v</pre>
+                    </div>
+                  </div>
+                </article>
+
+                <div class="setup-cta">
+                  <p>如果不习惯命令行，也可以直接去 Node.js 官方下载页获取最新安装包。</p>
+                  <a class="btn btn-primary" href="https://nodejs.org/en/download" target="_blank" rel="noreferrer">打开下载页</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="platform-panel" data-platform-panel="setup-node-mac">
+              <div class="stack-grid">
+                <article class="guide-card">
+                  <div class="path">Terminal</div>
+                  <div class="setup-code-stack">
+                    <p>如果还没有 Homebrew，先在终端里安装 Homebrew：</p>
+
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>HOMEBREW</span>
+                        <button class="copy-btn" data-copy="setup-node-mac-brew">复制</button>
+                      </div>
+                      <pre id="setup-node-mac-brew">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</pre>
+                    </div>
+
+                    <p>然后安装 Node.js：</p>
+
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>MACOS INSTALL</span>
+                        <button class="copy-btn" data-copy="setup-node-mac-install">复制</button>
+                      </div>
+                      <pre id="setup-node-mac-install">brew install node</pre>
+                    </div>
+
+                    <div class="small-note">安装完成后，重新打开终端，检查是否生效：</div>
+
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>VERIFY</span>
+                        <button class="copy-btn" data-copy="setup-node-mac-verify">复制</button>
+                      </div>
+                      <pre id="setup-node-mac-verify">node -v
+npm -v</pre>
+                    </div>
+                  </div>
+                </article>
+
+                <div class="setup-cta">
+                  <p>如果还没有 Homebrew，或者更习惯图形界面安装，也可以直接打开 Node.js 官方下载页。</p>
+                  <a class="btn btn-primary" href="https://nodejs.org/en/download" target="_blank" rel="noreferrer">打开下载页</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="subsection-head">
+              <h3>2. 检查 Git</h3>
+              <p>再确认 Git 是否已经可用。后面的 GPT 和 Claude 路线都会依赖 Git 环境。</p>
+            </div>
+
+            <article class="guide-card">
+              <div class="path">Terminal</div>
+              <div class="code-window">
+                <div class="window-head">
+                  <span>GIT CHECK</span>
+                  <button class="copy-btn" data-copy="setup-git-check">复制</button>
+                </div>
+                <pre id="setup-git-check">git --version</pre>
+              </div>
+            </article>
+
+            <div class="setup-banner setup-banner--hint">
+              <strong>如果没有 Git</strong>
+              <p>如果这条命令没有输出版本号，可以先安装 Git，然后重新打开终端再执行 <code>git --version</code> 检查。</p>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Git setup platform switcher">
+              <button class="active" type="button" role="tab" aria-selected="true" data-platform-tab="setup-git-win">Windows</button>
+              <button type="button" role="tab" aria-selected="false" data-platform-tab="setup-git-mac">macOS</button>
+            </div>
+
+            <div class="platform-panel active" data-platform-panel="setup-git-win">
+              <div class="stack-grid">
+                <article class="guide-card">
+                  <div class="path">管理员终端</div>
+                  <div class="setup-code-stack">
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>WINDOWS INSTALL</span>
+                        <button class="copy-btn" data-copy="setup-git-win-install">复制</button>
+                      </div>
+                      <pre id="setup-git-win-install">winget install Git.Git</pre>
+                    </div>
+
+                    <div class="small-note">安装完成后，重新打开终端，检查是否生效：</div>
+
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>VERIFY</span>
+                        <button class="copy-btn" data-copy="setup-git-win-verify">复制</button>
+                      </div>
+                      <pre id="setup-git-win-verify">git --version</pre>
+                    </div>
+                  </div>
+                </article>
+
+                <div class="setup-cta">
+                  <p>如果不习惯命令行，也可以直接去 Git 官方下载页安装 Windows 版本。</p>
+                  <a class="btn btn-primary" href="https://git-scm.com/download/win" target="_blank" rel="noreferrer">下载 Git</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="platform-panel" data-platform-panel="setup-git-mac">
+              <div class="stack-grid">
+                <article class="guide-card">
+                  <div class="path">Terminal</div>
+                  <div class="setup-code-stack">
+                    <p>如果还没有 Homebrew，先在终端里安装 Homebrew：</p>
+
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>HOMEBREW</span>
+                        <button class="copy-btn" data-copy="setup-git-mac-brew">复制</button>
+                      </div>
+                      <pre id="setup-git-mac-brew">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</pre>
+                    </div>
+
+                    <p>然后安装 Git：</p>
+
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>MACOS INSTALL</span>
+                        <button class="copy-btn" data-copy="setup-git-mac-install">复制</button>
+                      </div>
+                      <pre id="setup-git-mac-install">brew install git</pre>
+                    </div>
+
+                    <div class="small-note">安装完成后，重新打开终端，检查是否生效：</div>
+
+                    <div class="code-window">
+                      <div class="window-head">
+                        <span>VERIFY</span>
+                        <button class="copy-btn" data-copy="setup-git-mac-verify">复制</button>
+                      </div>
+                      <pre id="setup-git-mac-verify">git --version</pre>
+                    </div>
+                  </div>
+                </article>
+
+                <div class="setup-cta">
+                  <p>如果更习惯图形界面安装，也可以直接打开 Git 官方下载页获取 macOS 安装包。</p>
+                  <a class="btn btn-primary" href="https://git-scm.com/download/mac" target="_blank" rel="noreferrer">打开下载页</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-step">
+            <div class="subsection-head">
+              <h3>3. 选择使用 GPT 还是 Claude</h3>
+              <p>基础环境准备好之后，再进入对应路线继续安装和使用。这里的 GPT 路线对应下方的 Codex CLI。</p>
+            </div>
+
+            <div class="setup-choice-grid">
+              <article class="guide-card setup-choice-card">
+                <div class="path">OpenAI / GPT</div>
+                <h3>走 GPT 路线</h3>
+                <p>继续安装和使用 Codex CLI，适合准备接 OpenAI / GPT 工作流的场景。</p>
+                <a class="btn btn-primary" href="#codex">进入 GPT 配置</a>
+              </article>
+
+              <article class="guide-card setup-choice-card">
+                <div class="path">Anthropic / Claude</div>
+                <h3>走 Claude 路线</h3>
+                <p>继续安装和使用 Claude Code，适合后续接 Claude Code 工作流的场景。</p>
+                <a class="btn btn-secondary" href="#claude">进入 Claude 配置</a>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="section reveal" id="codex" style="--delay: 40ms;">
         <div class="section-head">
           <div>
-            <span class="section-kicker">01 · CODEX CLI</span>
-            <h2>Codex CLI 安装与使用</h2>
-            <p>先安装，再运行 <code>codex</code>。Windows 优先走 WSL2。</p>
+            <span class="section-kicker">01 · GPT / CODEX CLI</span>
+            <h2>GPT（Codex CLI）安装与使用</h2>
+            <p>基础环境准备好后，如果你走 GPT 路线，就在这里安装和使用 Codex CLI。Windows 优先走 WSL2。</p>
           </div>
         </div>
 
