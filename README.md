@@ -10,9 +10,9 @@
 ## 当前页面内容
 
 - Codex CLI
-  macOS / Linux、Windows / WSL2 的安装与启动方式
+  macOS / Linux、Windows PowerShell 的 npm 全局安装与启动方式
 - Claude Code
-  macOS / Linux、Windows 的安装与启动方式
+  macOS / Linux、Windows 的原生安装与 npm 全局安装方式
 - Claude Code API 配置
   `ANTHROPIC_BASE_URL=https://yjxapi-gpt.xyz`
   `ANTHROPIC_AUTH_TOKEN=xxx`
@@ -39,5 +39,7 @@ python -m http.server 8080
 
 - https://developers.openai.com/codex/cli
 - https://developers.openai.com/codex/cli/features
-- https://code.claude.com/docs/zh-CN/quickstart
-- https://code.claude.com/docs/zh-CN/overview
+- https://nodejs.org/en/download
+- https://git-scm.com/downloads/win
+- https://code.claude.com/docs/en/quickstart
+- https://code.claude.com/docs/en/getting-started
