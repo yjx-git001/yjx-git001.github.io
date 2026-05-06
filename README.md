@@ -14,12 +14,12 @@
 - Claude Code
   macOS / Linux、Windows 的原生安装与 npm 全局安装方式
 - Claude Code API 配置
-  `ANTHROPIC_BASE_URL=https://yjxapi-gpt.xyz`
+  `ANTHROPIC_BASE_URL=https://yjxapi.top`
   `ANTHROPIC_AUTH_TOKEN=xxx`
 - 接入示意
   `API Key / Base URL / Model` 示例卡片
 - CCSwitch
-  保留平台 switch，并继续使用 `https://yjxapi-gpt.xyz/v1`
+  保留平台 switch，并继续使用 `https://yjxapi.top/v1`
 
 ## 本地查看
 
@@ -32,8 +32,8 @@ python -m http.server 8080
 ## 页面约定
 
 - 页面里展示的密钥均为占位符，不放真实 key
-- Claude Code 配置地址使用 `https://yjxapi-gpt.xyz`
-- OpenAI 兼容接入与 CCSwitch 使用 `https://yjxapi-gpt.xyz/v1`
+- Claude Code 配置地址使用 `https://yjxapi.top`
+- OpenAI 兼容接入与 CCSwitch 使用 `https://yjxapi.top/v1`
 
 ## 参考文档
 
