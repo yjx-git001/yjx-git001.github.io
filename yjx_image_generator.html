@@ -51,7 +51,7 @@ function setStatus(t,c=""){statusEl.textContent=t;statusEl.className="status"+(c
 function joinUrl(b,p){return b.replace(/\/+$/,"")+"/"+p.replace(/^\/+/,"")}
 function nowText(){return new Date().toLocaleString("zh-CN",{hour12:false})}
 function setEmptyNormal(){emptyTitle.textContent="生成结果会显示在这里";emptyText.textContent="右侧会保存生成历史记录；点击任意历史记录，可查看当时的图片、参数和请求日志。"}
-function setEmptyGenerating(){emptyTitle.textContent="正在生成图片，请稍等";emptyText.textContent="生成成功后会自动加入右侧历史记录。"}
+function setEmptyGenerating(){emptyTitle.textContent="正在生成图片，请稍等";emptyText.textContent="生成成功后会自动加入右侧历史记录，大约需要 2-3 分钟。"}
 function shortText(t,n=64){return(t||"").length>n?(t||"").slice(0,n)+"…":(t||"")}
 function maskKey(k){if(!k)return"";return k.length<=10?"已隐藏":k.slice(0,4)+"****"+k.slice(-4)}
 function escapeHtml(s){return String(s||"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
